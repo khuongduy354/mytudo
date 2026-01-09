@@ -1,0 +1,221 @@
+.page {
+  padding: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.backBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.imageSection {
+  margin-bottom: 1.5rem;
+}
+
+.imagePreview {
+  width: 100%;
+  aspect-ratio: 3/4;
+  max-height: 400px;
+  object-fit: contain;
+  background: #f5f5f5;
+  border-radius: 1rem;
+}
+
+.imagePlaceholder {
+  width: 100%;
+  aspect-ratio: 3/4;
+  max-height: 400px;
+  background: #f5f5f5;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 2px dashed #ddd;
+  transition: border-color 0.2s;
+}
+
+.imagePlaceholder:hover {
+  border-color: #667eea;
+}
+
+.placeholderIcon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.placeholderText {
+  color: #666;
+}
+
+.imageActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.imageActionBtn {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  background: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+
+.imageActionBtn:hover {
+  border-color: #667eea;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  font-weight: 500;
+  color: #333;
+}
+
+.required {
+  color: #ef4444;
+}
+
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.categoryBtn {
+  padding: 1rem;
+  border: 2px solid #eee;
+  border-radius: 0.75rem;
+  background: white;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.categoryBtn:hover {
+  border-color: #667eea;
+}
+
+.categoryBtn.selected {
+  border-color: #667eea;
+  background: #f0f4ff;
+}
+
+.categoryIcon {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.categoryLabel {
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.colorGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.colorBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.colorBtn:hover {
+  transform: scale(1.1);
+}
+
+.colorBtn.selected {
+  border-color: #667eea;
+}
+
+.colorBtn.white {
+  border: 1px solid #ddd;
+}
+
+.colorBtn.white.selected {
+  border: 3px solid #667eea;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-bottom: 2rem;
+}
+
+.processing {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.processingSpinner {
+  font-size: 2rem;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error {
+  background: #fee;
+  color: #c00;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+}
+
+input[type="file"] {
+  display: none;
+}

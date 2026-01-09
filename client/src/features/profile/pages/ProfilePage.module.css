@@ -1,0 +1,197 @@
+.container {
+  padding: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e91e63, #f06292);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  font-size: 3rem;
+  color: white;
+}
+
+.header h1 {
+  font-size: 1.5rem;
+  color: #333;
+  margin: 0 0 0.25rem;
+}
+
+.phone {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.statCard {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #e91e63;
+  display: block;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.formGroup:last-child {
+  margin-bottom: 0;
+}
+
+.formGroup label {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.formGroup input {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.formGroup input:focus {
+  outline: none;
+  border-color: #e91e63;
+}
+
+.formGroup input:disabled {
+  background: #f5f5f5;
+  color: #999;
+}
+
+.saveBtn {
+  width: 100%;
+  padding: 0.75rem;
+  background: #e91e63;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.saveBtn:hover:not(:disabled) {
+  background: #c2185b;
+}
+
+.saveBtn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.menuItem:last-child {
+  border-bottom: none;
+}
+
+.menuItem:hover {
+  background: #f8f9fa;
+  margin: 0 -1.5rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.menuItemLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.menuIcon {
+  font-size: 1.25rem;
+}
+
+.menuLabel {
+  color: #333;
+}
+
+.menuArrow {
+  color: #999;
+}
+
+.logoutBtn {
+  width: 100%;
+  padding: 0.75rem;
+  background: #ffebee;
+  color: #d32f2f;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.logoutBtn:hover {
+  background: #ffcdd2;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}

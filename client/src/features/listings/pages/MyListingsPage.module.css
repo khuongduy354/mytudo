@@ -1,0 +1,193 @@
+.container {
+  padding: 1rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.header h1 {
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.statusTabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.statusTab {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: #f0f0f0;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.statusTab:hover {
+  background: #e0e0e0;
+}
+
+.statusTab.active {
+  background: #e91e63;
+  color: white;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.listingCard {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.imageWrapper {
+  aspect-ratio: 4/3;
+  background: #f0f0f0;
+  overflow: hidden;
+  position: relative;
+}
+
+.imageWrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.noImage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 3rem;
+}
+
+.statusBadge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.statusBadge.active {
+  background: #4caf50;
+  color: white;
+}
+
+.statusBadge.sold {
+  background: #2196f3;
+  color: white;
+}
+
+.statusBadge.cancelled {
+  background: #9e9e9e;
+  color: white;
+}
+
+.cardContent {
+  padding: 1rem;
+}
+
+.cardTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  color: #333;
+}
+
+.cardPrice {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #e91e63;
+  margin-bottom: 0.5rem;
+}
+
+.cardDate {
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 1rem;
+}
+
+.cardActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.editBtn,
+.cancelBtn {
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.editBtn {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.editBtn:hover {
+  background: #e0e0e0;
+}
+
+.cancelBtn {
+  background: #ffebee;
+  color: #d32f2f;
+}
+
+.cancelBtn:hover {
+  background: #ffcdd2;
+}
+
+.loading,
+.error,
+.empty {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}
+
+.error {
+  color: #d32f2f;
+}
+
+.empty p {
+  margin-bottom: 1rem;
+}
+
+.addLink {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: #e91e63;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.addLink:hover {
+  background: #c2185b;
+}

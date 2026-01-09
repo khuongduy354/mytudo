@@ -1,0 +1,126 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.card {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.logo {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  color: #667eea;
+}
+
+.tagline {
+  text-align: center;
+  color: #666;
+  margin-bottom: 2rem;
+  font-size: 0.9rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #333;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.phoneInputWrapper {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.countryCode {
+  flex: 0 0 80px;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background: #f9f9f9;
+  text-align: center;
+}
+
+.phoneInput {
+  flex: 1;
+}
+
+.otpInfo {
+  text-align: center;
+  color: #666;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.otpInputWrapper {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.otpInput {
+  width: 3rem;
+  height: 3rem;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  border: 2px solid #ddd;
+  border-radius: 0.5rem;
+  transition: border-color 0.2s;
+}
+
+.otpInput:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.resendLink {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.resendLink button {
+  background: none;
+  border: none;
+  color: #667eea;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.resendLink button:disabled {
+  color: #999;
+  cursor: not-allowed;
+}
+
+.error {
+  background: #fee;
+  color: #c00;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.backButton {
+  margin-top: 1rem;
+}

@@ -1,0 +1,110 @@
+
+// MYTuDo Database Schema
+// Using Supabase (PostgreSQL)
+
+// Enums
+enum item_category {
+  tops
+  bottoms
+  footwear
+  accessories
+}
+
+enum listing_condition {
+  new
+  like_new
+  used
+}
+
+enum listing_status {
+  active
+  sold
+  removed
+}
+
+// ================================
+// TABLES
+// ================================
+
+// Users table (extends Supabase auth.users)
+Table users {
+  id uuid [pk, ref: > auth.users.id]
+  phone varchar(20) [not null, unique]
+  full_name varchar(100)
+  avatar_url text
+  created_at timestamptz [default: `now()`]
+  updated_at timestamptz [default: `now()`]
+}
+
+// Wardrobe items
+Table wardrobe_items {
+  id uuid [pk, default: `gen_random_uuid()`]
+  user_id uuid [not null, ref: > users.id]
+  image_url text [not null]
+  category item_category [not null]
+  color varchar(50) [not null]
+  name varchar(100)
+  brand varchar(50)
+  size varchar(20)
+  material varchar(50)
+  purchase_price decimal(12,2)
+  created_at timestamptz [default: `now()`]
+  updated_at timestamptz [default: `now()`]
+  
+  indexes {
+    user_id
+    category
+    (user_id, category)
+  }
+}
+
+// Marketplace listings
+Table listings {
+  id uuid [pk, default: `gen_random_uuid()`]
+  seller_id uuid [not null, ref: > users.id]
+  wardrobe_item_id uuid [not null, ref: > wardrobe_items.id]
+  price decimal(12,2) [not null]
+  condition listing_condition [not null]
+  description text
+  status listing_status [not null, default: 'active']
+  created_at timestamptz [default: `now()`]
+  updated_at timestamptz [default: `now()`]
+  
+  indexes {
+    seller_id
+    status
+    (status, created_at)
+    wardrobe_item_id [unique]
+  }
+}
+
+// Wishlist (saved listings)
+Table wishlist {
+  id uuid [pk, default: `gen_random_uuid()`]
+  user_id uuid [not null, ref: > users.id]
+  listing_id uuid [not null, ref: > listings.id]
+  created_at timestamptz [default: `now()`]
+  
+  indexes {
+    (user_id, listing_id) [unique]
+    user_id
+  }
+}
+
+// ================================
+// RELATIONSHIPS
+// ================================
+// users 1--* wardrobe_items
+// users 1--* listings (as seller)
+// users 1--* wishlist
+// wardrobe_items 1--1 listings
+// listings 1--* wishlist
+
+// ================================
+// MOCK: Supabase Auth Table
+// ================================
+Table auth.users {
+  id uuid [pk]
+  phone varchar
+  // ... other Supabase auth fields
+}
