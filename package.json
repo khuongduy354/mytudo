@@ -11,10 +11,14 @@
         "dev:client": "npm run dev --workspace=client",
         "dev:server": "npm run dev --workspace=server",
         "build": "npm run build --workspaces",
-        "lint": "npm run lint --workspaces"
+        "lint": "npm run lint --workspaces",
+        "db:reset": "npx supabase db reset && npm run db:seed",
+        "db:seed": "tsx supabase/seed.ts"
     },
     "devDependencies": {
+        "@supabase/supabase-js": "^2.90.1",
         "concurrently": "^8.2.2",
+        "tsx": "^4.21.0",
         "typescript": "^5.3.3"
     }
 }

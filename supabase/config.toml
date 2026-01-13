@@ -200,6 +200,7 @@ enable_signup = true
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
+# DEV: disabled for easier testing. PROD: should be enabled
 enable_confirmations = false
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
 secure_password_change = false
@@ -233,7 +234,8 @@ otp_expiry = 3600
 
 [auth.sms]
 # Allow/disallow new user signups via SMS to your project.
-enable_signup = true
+# Disabled - using email authentication instead
+enable_signup = false
 # If enabled, users need to confirm their phone number before signing in.
 enable_confirmations = false
 # Template for sending OTP to users
@@ -242,12 +244,8 @@ template = "Your code is {{ .Code }}"
 max_frequency = "5s"
 
 # Use pre-defined map of phone number to OTP for testing.
-[auth.sms.test_otp]
-# Vietnamese test numbers - use these for development
-"+84949802981" = "123456"
-"0949802981" = "123456"
-"+84901234567" = "111111"
-"0901234567" = "111111"
+# [auth.sms.test_otp]
+# Phone OTP disabled - using email authentication
 
 # Configure logged in session timeouts.
 # [auth.sessions]

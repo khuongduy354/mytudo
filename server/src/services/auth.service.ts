@@ -6,6 +6,8 @@ import type {
   UpdateProfileRequest,
   LoginWithEmailRequest,
   RegisterWithEmailRequest,
+  SendMagicLinkRequest,
+  SendMagicLinkResponse,
 } from "@mytudo/shared";
 
 export class AuthService {
@@ -79,53 +81,22 @@ export class AuthService {
     };
   }
 
-  // Phone OTP authentication
-  async sendOtp(phone: string): Promise<{ message: string }> {
-    // Normalize phone number to +84 format
-    const normalizedPhone = phone.startsWith("0")
-      ? phone.replace(/^0/, "+84")
-      : phone;
-
+  // Magic link authentication (passwordless email login)
+  async sendMagicLink(
+    data: SendMagicLinkRequest
+  ): Promise<SendMagicLinkResponse> {
     const { error } = await this.supabase.getClient().auth.signInWithOtp({
-      phone: normalizedPhone,
+      email: data.email,
+      options: {
+        emailRedirectTo: process.env.SITE_URL || "http://127.0.0.1:3000",
+      },
     });
 
-    if (error) throw new Error(`Failed to send OTP: ${error.message}`);
-
-    return { message: "OTP sent successfully" };
-  }
-
-  async verifyOtp(phone: string, otp: string): Promise<AuthResponse> {
-    // Normalize phone number to +84 format
-    const normalizedPhone = phone.startsWith("0")
-      ? phone.replace(/^0/, "+84")
-      : phone;
-
-    const { data, error } = await this.supabase.getClient().auth.verifyOtp({
-      phone: normalizedPhone,
-      token: otp,
-      type: "sms",
-    });
-
-    if (error || !data.user) {
-      throw new Error(
-        `OTP verification failed: ${error?.message || "Unknown error"}`
-      );
+    if (error) {
+      throw new Error(`Failed to send magic link: ${error.message}`);
     }
 
-    // Create or update user profile
-    let user = await this.userModel.findById(data.user.id);
-    if (!user) {
-      user = await this.userModel.create(data.user.id, {
-        phone: normalizedPhone,
-      });
-    }
-
-    return {
-      user,
-      accessToken: data.session?.access_token || "",
-      refreshToken: data.session?.refresh_token || "",
-    };
+    return { message: "Magic link sent successfully" };
   }
 
   async getMe(userId: string): Promise<UserProfile | null> {

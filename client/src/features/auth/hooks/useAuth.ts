@@ -8,8 +8,9 @@ import {
   useAuthLoading,
 } from "../../../stores/auth.store";
 import type {
-  SendOtpRequest,
-  VerifyOtpRequest,
+  LoginWithEmailRequest,
+  RegisterWithEmailRequest,
+  SendMagicLinkRequest,
   UpdateProfileRequest,
 } from "@mytudo/shared";
 
@@ -54,17 +55,26 @@ export function useAuth() {
     }
   }, [isAuthenticated, isUserLoading, setLoading]);
 
-  const sendOtpMutation = useMutation({
-    mutationFn: authApi.sendOtp,
-  });
-
-  const verifyOtpMutation = useMutation({
-    mutationFn: authApi.verifyOtp,
+  const loginWithEmailMutation = useMutation({
+    mutationFn: authApi.loginWithEmail,
     onSuccess: (data) => {
       setTokens(data.accessToken, data.refreshToken);
       setUser(data.user);
       queryClient.setQueryData(["user", "me"], data.user);
     },
+  });
+
+  const registerWithEmailMutation = useMutation({
+    mutationFn: authApi.registerWithEmail,
+    onSuccess: (data) => {
+      setTokens(data.accessToken, data.refreshToken);
+      setUser(data.user);
+      queryClient.setQueryData(["user", "me"], data.user);
+    },
+  });
+
+  const sendMagicLinkMutation = useMutation({
+    mutationFn: authApi.sendMagicLink,
   });
 
   const updateProfileMutation = useMutation({
@@ -88,12 +98,16 @@ export function useAuth() {
     },
   });
 
-  const sendOtp = async (data: SendOtpRequest) => {
-    await sendOtpMutation.mutateAsync(data);
+  const loginWithEmail = async (data: LoginWithEmailRequest) => {
+    await loginWithEmailMutation.mutateAsync(data);
   };
 
-  const verifyOtp = async (data: VerifyOtpRequest) => {
-    await verifyOtpMutation.mutateAsync(data);
+  const registerWithEmail = async (data: RegisterWithEmailRequest) => {
+    await registerWithEmailMutation.mutateAsync(data);
+  };
+
+  const sendMagicLink = async (data: SendMagicLinkRequest) => {
+    await sendMagicLinkMutation.mutateAsync(data);
   };
 
   const updateProfile = async (data: UpdateProfileRequest) => {
@@ -108,14 +122,17 @@ export function useAuth() {
     user,
     isAuthenticated,
     isLoading: isLoading || isUserLoading,
-    sendOtp,
-    verifyOtp,
+    loginWithEmail,
+    registerWithEmail,
+    sendMagicLink,
     updateProfile,
     logout,
-    sendOtpError: sendOtpMutation.error,
-    verifyOtpError: verifyOtpMutation.error,
-    isSendOtpPending: sendOtpMutation.isPending,
-    isVerifyOtpPending: verifyOtpMutation.isPending,
+    loginWithEmailError: loginWithEmailMutation.error,
+    registerWithEmailError: registerWithEmailMutation.error,
+    sendMagicLinkError: sendMagicLinkMutation.error,
+    isLoginWithEmailPending: loginWithEmailMutation.isPending,
+    isRegisterWithEmailPending: registerWithEmailMutation.isPending,
+    isSendMagicLinkPending: sendMagicLinkMutation.isPending,
     isUpdateProfilePending: updateProfileMutation.isPending,
   };
 }

@@ -6,8 +6,7 @@ import { validateRequest } from "../middleware/validation.middleware.js";
 import {
   loginWithEmailSchema,
   registerWithEmailSchema,
-  sendOtpSchema,
-  verifyOtpSchema,
+  sendMagicLinkSchema,
   updateProfileSchema,
   refreshTokenSchema,
 } from "@mytudo/shared";
@@ -29,13 +28,11 @@ export function createAuthRouter(container: DIContainer): Router {
     controller.registerWithEmail
   );
 
-  // Phone OTP auth routes
-  router.post("/send-otp", validateRequest(sendOtpSchema), controller.sendOtp);
-
+  // Magic link auth route
   router.post(
-    "/verify-otp",
-    validateRequest(verifyOtpSchema),
-    controller.verifyOtp
+    "/send-magic-link",
+    validateRequest(sendMagicLinkSchema),
+    controller.sendMagicLink
   );
 
   router.post(

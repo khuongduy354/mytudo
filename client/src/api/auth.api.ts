@@ -1,8 +1,9 @@
 import { apiClient } from "./client";
 import type {
-  SendOtpRequest,
-  SendOtpResponse,
-  VerifyOtpRequest,
+  LoginWithEmailRequest,
+  RegisterWithEmailRequest,
+  SendMagicLinkRequest,
+  SendMagicLinkResponse,
   AuthResponse,
   UserProfile,
   UpdateProfileRequest,
@@ -10,13 +11,24 @@ import type {
 } from "@mytudo/shared";
 
 export const authApi = {
-  sendOtp: async (data: SendOtpRequest): Promise<SendOtpResponse> => {
-    const response = await apiClient.post("/auth/send-otp", data);
+  loginWithEmail: async (
+    data: LoginWithEmailRequest
+  ): Promise<AuthResponse> => {
+    const response = await apiClient.post("/auth/login", data);
     return response.data.data;
   },
 
-  verifyOtp: async (data: VerifyOtpRequest): Promise<AuthResponse> => {
-    const response = await apiClient.post("/auth/verify-otp", data);
+  registerWithEmail: async (
+    data: RegisterWithEmailRequest
+  ): Promise<AuthResponse> => {
+    const response = await apiClient.post("/auth/register", data);
+    return response.data.data;
+  },
+
+  sendMagicLink: async (
+    data: SendMagicLinkRequest
+  ): Promise<SendMagicLinkResponse> => {
+    const response = await apiClient.post("/auth/send-magic-link", data);
     return response.data.data;
   },
 

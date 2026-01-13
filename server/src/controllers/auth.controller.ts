@@ -27,21 +27,10 @@ export class AuthController {
     }
   };
 
-  // Phone OTP authentication
-  sendOtp = async (req: Request, res: Response, next: NextFunction) => {
+  // Magic link authentication
+  sendMagicLink = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { phone } = req.body;
-      const result = await this.authService.sendOtp(phone);
-      res.json({ success: true, data: result });
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  verifyOtp = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { phone, otp } = req.body;
-      const result = await this.authService.verifyOtp(phone, otp);
+      const result = await this.authService.sendMagicLink(req.body);
       res.json({ success: true, data: result });
     } catch (error) {
       next(error);

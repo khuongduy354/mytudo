@@ -22,18 +22,13 @@ export interface RegisterWithEmailRequest {
   fullName?: string;
 }
 
-// Phone OTP auth
-export interface SendOtpRequest {
-  phone: string;
+// Magic link (passwordless email login)
+export interface SendMagicLinkRequest {
+  email: string;
 }
 
-export interface SendOtpResponse {
+export interface SendMagicLinkResponse {
   message: string;
-}
-
-export interface VerifyOtpRequest {
-  phone: string;
-  otp: string;
 }
 
 export interface AuthTokens {

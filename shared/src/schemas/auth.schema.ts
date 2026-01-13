@@ -1,8 +1,5 @@
 import { z } from "zod";
 
-// Phone validation (Vietnamese format)
-const phoneRegex = /^(\+84|0)[0-9]{9,10}$/;
-
 // Email validation
 const emailSchema = z.string().email("Email không hợp lệ");
 
@@ -19,22 +16,9 @@ export const registerWithEmailSchema = z.object({
   fullName: z.string().min(2, "Tên phải có ít nhất 2 ký tự").optional(),
 });
 
-// Phone OTP flow
-export const sendOtpSchema = z.object({
-  phone: z
-    .string()
-    .regex(
-      phoneRegex,
-      "Số điện thoại không hợp lệ. Ví dụ: +84901234567 hoặc 0901234567"
-    ),
-});
-
-export const verifyOtpSchema = z.object({
-  phone: z.string().regex(phoneRegex, "Số điện thoại không hợp lệ"),
-  otp: z
-    .string()
-    .length(6, "Mã OTP phải có 6 chữ số")
-    .regex(/^[0-9]+$/, "Mã OTP chỉ chứa số"),
+// Magic link (passwordless email login)
+export const sendMagicLinkSchema = z.object({
+  email: emailSchema,
 });
 
 export const updateProfileSchema = z.object({
@@ -53,7 +37,6 @@ export const refreshTokenSchema = z.object({
 // Type exports
 export type LoginWithEmailInput = z.infer<typeof loginWithEmailSchema>;
 export type RegisterWithEmailInput = z.infer<typeof registerWithEmailSchema>;
-export type SendOtpInput = z.infer<typeof sendOtpSchema>;
-export type VerifyOtpInput = z.infer<typeof verifyOtpSchema>;
+export type SendMagicLinkInput = z.infer<typeof sendMagicLinkSchema>;
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>;
