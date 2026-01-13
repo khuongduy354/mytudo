@@ -4,6 +4,8 @@ import type {
   WardrobeFilters,
   CreateWardrobeItemRequest,
   UpdateWardrobeItemRequest,
+  CreateWardrobeRequest,
+  UpdateWardrobeRequest,
 } from "@mytudo/shared";
 
 export function useWardrobe(filters?: WardrobeFilters) {
@@ -64,6 +66,59 @@ export function useDeleteWardrobeItem() {
   return useMutation({
     mutationFn: (id: string) => wardrobeApi.deleteItem(id),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["wardrobe"] });
+    },
+  });
+}
+
+// Wardrobe management hooks
+export function useWardrobes() {
+  return useQuery({
+    queryKey: ["wardrobes"],
+    queryFn: wardrobeApi.getWardrobes,
+  });
+}
+
+export function useWardrobeById(id: string | undefined) {
+  return useQuery({
+    queryKey: ["wardrobes", id],
+    queryFn: () => wardrobeApi.getWardrobe(id!),
+    enabled: !!id,
+  });
+}
+
+export function useCreateWardrobe() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreateWardrobeRequest) =>
+      wardrobeApi.createWardrobe(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["wardrobes"] });
+    },
+  });
+}
+
+export function useUpdateWardrobe() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateWardrobeRequest }) =>
+      wardrobeApi.updateWardrobe(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ["wardrobes"] });
+      queryClient.invalidateQueries({ queryKey: ["wardrobes", id] });
+    },
+  });
+}
+
+export function useDeleteWardrobe() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => wardrobeApi.deleteWardrobe(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["wardrobes"] });
       queryClient.invalidateQueries({ queryKey: ["wardrobe"] });
     },
   });

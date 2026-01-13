@@ -25,6 +25,14 @@ export class ListingService {
       throw new Error("Wardrobe item not found or access denied");
     }
 
+    // Verify the item is in a public wardrobe
+    const wardrobe = await this.wardrobeModel.findWardrobeById(item.wardrobeId);
+    if (!wardrobe || wardrobe.visibility !== "public") {
+      throw new Error(
+        "Cannot list items from private wardrobes. Please move the item to a public wardrobe first."
+      );
+    }
+
     // Check if item already has a listing
     const existingListing = await this.listingModel.findByWardrobeItemId(
       data.wardrobeItemId

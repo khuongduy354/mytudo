@@ -62,7 +62,7 @@ export class ListingModel {
         `
         *,
         wardrobe_items (*),
-        users:seller_id (id, full_name, avatar_url)
+        users:seller_id!inner (id, full_name, avatar_url)
       `
       )
       .eq("id", id)
@@ -88,6 +88,7 @@ export class ListingModel {
       wardrobeItem: {
         id: data.wardrobe_items.id,
         userId: data.wardrobe_items.user_id,
+        wardrobeId: data.wardrobe_items.wardrobe_id,
         imageUrl: data.wardrobe_items.image_url,
         category: data.wardrobe_items.category,
         color: data.wardrobe_items.color,
@@ -118,15 +119,42 @@ export class ListingModel {
     const { data, error, count } = await this.supabase
       .getClient()
       .from("listings")
-      .select("*", { count: "exact" })
+      .select(
+        `
+        *,
+        wardrobe_items (*)
+      `,
+        { count: "exact" }
+      )
       .eq("seller_id", sellerId)
       .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (error) throw new Error(`Failed to fetch listings: ${error.message}`);
 
+    const items = (data || []).map((item) => ({
+      ...this.mapToListing(item),
+      wardrobeItem: item.wardrobe_items
+        ? {
+            id: item.wardrobe_items.id,
+            userId: item.wardrobe_items.user_id,
+            wardrobeId: item.wardrobe_items.wardrobe_id,
+            imageUrl: item.wardrobe_items.image_url,
+            category: item.wardrobe_items.category,
+            color: item.wardrobe_items.color,
+            name: item.wardrobe_items.name,
+            brand: item.wardrobe_items.brand,
+            size: item.wardrobe_items.size,
+            material: item.wardrobe_items.material,
+            purchasePrice: item.wardrobe_items.purchase_price,
+            createdAt: item.wardrobe_items.created_at,
+            updatedAt: item.wardrobe_items.updated_at,
+          }
+        : undefined,
+    }));
+
     return {
-      items: (data || []).map((item) => this.mapToListing(item)),
+      items,
       meta: {
         page,
         limit,
@@ -170,8 +198,14 @@ export class ListingModel {
       .select(
         `
         *,
-        wardrobe_items!inner (*),
-        users:seller_id (id, full_name, avatar_url)
+        wardrobe_items!inner (
+          *,
+          wardrobes!inner(
+            id,
+            visibility
+          )
+        ),
+        users:seller_id!inner (id, full_name, avatar_url)
       `,
         { count: "exact" }
       )
@@ -232,29 +266,37 @@ export class ListingModel {
       wishlistedIds = new Set(wishlistData?.map((w) => w.listing_id) || []);
     }
 
-    const items: ListingWithDetails[] = (data || []).map((item) => ({
-      ...this.mapToListing(item),
-      wardrobeItem: {
-        id: item.wardrobe_items.id,
-        userId: item.wardrobe_items.user_id,
-        imageUrl: item.wardrobe_items.image_url,
-        category: item.wardrobe_items.category,
-        color: item.wardrobe_items.color,
-        name: item.wardrobe_items.name,
-        brand: item.wardrobe_items.brand,
-        size: item.wardrobe_items.size,
-        material: item.wardrobe_items.material,
-        purchasePrice: item.wardrobe_items.purchase_price,
-        createdAt: item.wardrobe_items.created_at,
-        updatedAt: item.wardrobe_items.updated_at,
-      },
-      seller: {
-        id: item.users.id,
-        fullName: item.users.full_name,
-        avatarUrl: item.users.avatar_url,
-      },
-      isWishlisted: wishlistedIds.has(item.id),
-    }));
+    const items: ListingWithDetails[] = (data || [])
+      .filter((item) => {
+        // Filter out invalid data and non-public wardrobes
+        if (!item.wardrobe_items || !item.users) return false;
+        if (!item.wardrobe_items.wardrobes) return false;
+        return item.wardrobe_items.wardrobes.visibility === "public";
+      })
+      .map((item) => ({
+        ...this.mapToListing(item),
+        wardrobeItem: {
+          id: item.wardrobe_items.id,
+          userId: item.wardrobe_items.user_id,
+          wardrobeId: item.wardrobe_items.wardrobe_id,
+          imageUrl: item.wardrobe_items.image_url,
+          category: item.wardrobe_items.category,
+          color: item.wardrobe_items.color,
+          name: item.wardrobe_items.name,
+          brand: item.wardrobe_items.brand,
+          size: item.wardrobe_items.size,
+          material: item.wardrobe_items.material,
+          purchasePrice: item.wardrobe_items.purchase_price,
+          createdAt: item.wardrobe_items.created_at,
+          updatedAt: item.wardrobe_items.updated_at,
+        },
+        seller: {
+          id: item.users.id,
+          fullName: item.users.full_name,
+          avatarUrl: item.users.avatar_url,
+        },
+        isWishlisted: wishlistedIds.has(item.id),
+      }));
 
     return {
       items,

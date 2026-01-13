@@ -1,10 +1,41 @@
-// Wardrobe types
+// Wardrobe types - derived from schemas
 
-export type ItemCategory = "tops" | "bottoms" | "footwear" | "accessories";
+import type {
+  ItemCategoryInput,
+  CreateWardrobeItemInput,
+  UpdateWardrobeItemInput,
+  WardrobeFiltersInput,
+} from "../schemas/wardrobe.schema";
+
+// Derived from schemas
+export type ItemCategory = ItemCategoryInput;
+export type WardrobeVisibility = "public" | "private";
+
+export interface Wardrobe {
+  id: string;
+  userId: string;
+  name: string;
+  visibility: WardrobeVisibility;
+  createdAt: string;
+  updatedAt: string;
+  // Virtual fields
+  itemCount?: number;
+}
+
+export interface CreateWardrobeRequest {
+  name: string;
+  visibility?: WardrobeVisibility;
+}
+
+export interface UpdateWardrobeRequest {
+  name?: string;
+  visibility?: WardrobeVisibility;
+}
 
 export interface WardrobeItem {
   id: string;
   userId: string;
+  wardrobeId: string;
   imageUrl: string;
   category: ItemCategory;
   color: string;
@@ -19,34 +50,17 @@ export interface WardrobeItem {
   hasListing?: boolean;
 }
 
-export interface CreateWardrobeItemRequest {
-  imageUrl: string;
-  category: ItemCategory;
-  color: string;
-  name?: string;
-  brand?: string;
-  size?: string;
-  material?: string;
-  purchasePrice?: number;
+// Derived from schemas but extended with additional fields not in validation schemas
+export interface CreateWardrobeItemRequest extends CreateWardrobeItemInput {
+  wardrobeId?: string;
 }
 
-export interface UpdateWardrobeItemRequest {
-  imageUrl?: string;
-  category?: ItemCategory;
-  color?: string;
-  name?: string;
-  brand?: string;
-  size?: string;
-  material?: string;
-  purchasePrice?: number;
+export interface UpdateWardrobeItemRequest extends UpdateWardrobeItemInput {
+  wardrobeId?: string;
 }
 
-export interface WardrobeFilters {
-  category?: ItemCategory;
-  color?: string;
-  search?: string;
-  page?: number;
-  limit?: number;
+export interface WardrobeFilters extends Partial<WardrobeFiltersInput> {
+  wardrobeId?: string;
 }
 
 export const ITEM_CATEGORIES: ItemCategory[] = [

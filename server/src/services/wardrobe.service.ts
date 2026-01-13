@@ -6,6 +6,9 @@ import type {
   UpdateWardrobeItemRequest,
   WardrobeFilters,
   PaginationMeta,
+  Wardrobe,
+  CreateWardrobeRequest,
+  UpdateWardrobeRequest,
 } from "@mytudo/shared";
 
 export class WardrobeService {
@@ -52,7 +55,19 @@ export class WardrobeService {
     userId: string,
     data: CreateWardrobeItemRequest
   ): Promise<WardrobeItem> {
-    return this.wardrobeModel.create(userId, data);
+    // If no wardrobe specified, use default wardrobe
+    let wardrobeId = data.wardrobeId;
+    if (!wardrobeId) {
+      const defaultWardrobe = await this.wardrobeModel.getDefaultWardrobe(
+        userId
+      );
+      if (!defaultWardrobe) {
+        throw new Error("No default wardrobe found");
+      }
+      wardrobeId = defaultWardrobe.id;
+    }
+
+    return this.wardrobeModel.create(userId, { ...data, wardrobeId });
   }
 
   async updateItem(
@@ -89,5 +104,48 @@ export class WardrobeService {
 
   async getItemCount(userId: string): Promise<number> {
     return this.wardrobeModel.countByUser(userId);
+  }
+
+  // ================================
+  // WARDROBE MANAGEMENT
+  // ================================
+
+  async getWardrobes(userId: string): Promise<Wardrobe[]> {
+    return this.wardrobeModel.findWardrobesByUser(userId);
+  }
+
+  async getWardrobe(id: string, userId: string): Promise<Wardrobe | null> {
+    const wardrobe = await this.wardrobeModel.findWardrobeById(id);
+    if (!wardrobe || wardrobe.userId !== userId) return null;
+    return wardrobe;
+  }
+
+  async createWardrobe(
+    userId: string,
+    data: CreateWardrobeRequest
+  ): Promise<Wardrobe> {
+    return this.wardrobeModel.createWardrobe(userId, data);
+  }
+
+  async updateWardrobe(
+    id: string,
+    userId: string,
+    data: UpdateWardrobeRequest
+  ): Promise<Wardrobe> {
+    const existing = await this.wardrobeModel.findWardrobeById(id);
+    if (!existing || existing.userId !== userId) {
+      throw new Error("Wardrobe not found or access denied");
+    }
+
+    return this.wardrobeModel.updateWardrobe(id, userId, data);
+  }
+
+  async deleteWardrobe(id: string, userId: string): Promise<void> {
+    const existing = await this.wardrobeModel.findWardrobeById(id);
+    if (!existing || existing.userId !== userId) {
+      throw new Error("Wardrobe not found or access denied");
+    }
+
+    return this.wardrobeModel.deleteWardrobe(id, userId);
   }
 }

@@ -1,10 +1,18 @@
-// Listing/Marketplace types
+// Listing/Marketplace types - derived from schemas
 
 import type { WardrobeItem } from "./wardrobe";
 import type { UserProfile } from "./auth";
+import type {
+  ListingConditionInput,
+  ListingStatusInput,
+  CreateListingInput,
+  UpdateListingInput,
+  MarketplaceFiltersInput,
+} from "../schemas/listing.schema";
 
-export type ListingCondition = "new" | "like_new" | "used";
-export type ListingStatus = "active" | "sold" | "removed" | "cancelled";
+// Derived from schemas
+export type ListingCondition = ListingConditionInput;
+export type ListingStatus = ListingStatusInput;
 export type ListingSortBy = "newest" | "price_asc" | "price_desc";
 
 export interface Listing {
@@ -27,29 +35,13 @@ export interface ListingWithDetails extends Listing {
   isWishlisted?: boolean;
 }
 
-export interface CreateListingRequest {
-  wardrobeItemId: string;
-  price: number;
-  condition: ListingCondition;
-  description?: string;
-}
+// Derived from schemas
+export type CreateListingRequest = CreateListingInput;
+export type UpdateListingRequest = UpdateListingInput;
 
-export interface UpdateListingRequest {
-  price?: number;
-  condition?: ListingCondition;
-  description?: string;
-  status?: ListingStatus;
-}
-
-export interface MarketplaceFilters {
-  category?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  condition?: ListingCondition;
-  search?: string;
-  sort?: ListingSortBy;
-  page?: number;
-  limit?: number;
+// MarketplaceFilters extends schema input with optional fields for client usage
+export interface MarketplaceFilters extends Partial<MarketplaceFiltersInput> {
+  status?: ListingStatus; // Added for client-side filtering
 }
 
 export const LISTING_CONDITIONS: ListingCondition[] = [

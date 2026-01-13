@@ -1,7 +1,7 @@
 import { apiClient } from "./client";
 import type {
   WishlistItem,
-  WishlistItemWithListing,
+  ListingWithDetails,
   PaginatedResponse,
 } from "@mytudo/shared";
 
@@ -10,8 +10,8 @@ export const wishlistApi = {
     page: number = 1,
     limit: number = 20
   ): Promise<{
-    data: WishlistItemWithListing[];
-    meta: PaginatedResponse<WishlistItemWithListing>["meta"];
+    data: ListingWithDetails[];
+    meta: PaginatedResponse<ListingWithDetails>["meta"];
   }> => {
     const response = await apiClient.get("/wishlist", {
       params: { page, limit },

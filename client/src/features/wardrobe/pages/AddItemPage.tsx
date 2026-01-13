@@ -1,8 +1,9 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { removeBackground } from "@imgly/background-removal";
 import { Button } from "../../../components/Button";
 import { Input } from "../../../components/Input";
-import { useCreateWardrobeItem } from "../hooks/useWardrobe";
+import { useCreateWardrobeItem, useWardrobes } from "../hooks/useWardrobe";
 import { uploadApi } from "../../../api/upload.api";
 import {
   ITEM_CATEGORIES,
@@ -11,13 +12,6 @@ import {
   type ItemCategory,
 } from "@mytudo/shared";
 import styles from "./AddItemPage.module.css";
-
-const CATEGORY_ICONS: Record<ItemCategory, string> = {
-  tops: "👕",
-  bottoms: "👖",
-  footwear: "👟",
-  accessories: "👜",
-};
 
 const COLOR_MAP: Record<string, string> = {
   black: "#000000",
@@ -38,12 +32,16 @@ const COLOR_MAP: Record<string, string> = {
 export function AddItemPage() {
   const navigate = useNavigate();
   const createMutation = useCreateWardrobeItem();
+  const { data: wardrobes, isLoading: loadingWardrobes } = useWardrobes();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isRemovingBg, setIsRemovingBg] = useState(false);
+  const [bgRemoved, setBgRemoved] = useState(false);
 
+  const [wardrobeId, setWardrobeId] = useState<string>("");
   const [category, setCategory] = useState<ItemCategory | null>(null);
   const [color, setColor] = useState<string | null>(null);
   const [name, setName] = useState("");
@@ -54,11 +52,83 @@ export function AddItemPage() {
 
   const [error, setError] = useState<string | null>(null);
 
+  const processFile = (file: File) => {
+    if (file.type.startsWith("image/")) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+      setBgRemoved(false);
+    }
+  };
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImageFile(file);
-      setImagePreview(URL.createObjectURL(file));
+      processFile(file);
+    }
+  };
+
+  const handlePaste = (e: ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    for (const item of items) {
+      if (item.type.startsWith("image/")) {
+        const file = item.getAsFile();
+        if (file) {
+          processFile(file);
+          e.preventDefault();
+        }
+        break;
+      }
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith("image/")) {
+      processFile(file);
+    }
+  };
+
+  // Add paste event listener
+  useEffect(() => {
+    const handleWindowPaste = (e: Event) => handlePaste(e as ClipboardEvent);
+    window.addEventListener("paste", handleWindowPaste);
+    return () => window.removeEventListener("paste", handleWindowPaste);
+  }, []);
+
+  const handleRemoveBackground = async () => {
+    if (!imageFile) return;
+
+    try {
+      setIsRemovingBg(true);
+      setError(null);
+
+      const blob = await removeBackground(imageFile);
+      const processedFile = new File(
+        [blob],
+        imageFile.name.replace(/\.[^/.]+$/, ".png"),
+        {
+          type: "image/png",
+        }
+      );
+
+      setImageFile(processedFile);
+      setImagePreview(URL.createObjectURL(processedFile));
+      setBgRemoved(true);
+    } catch (err) {
+      setError("Không thể xóa nền ảnh. Vui lòng thử lại.");
+      console.error("Background removal error:", err);
+    } finally {
+      setIsRemovingBg(false);
     }
   };
 
@@ -69,6 +139,10 @@ export function AddItemPage() {
     // Validation
     if (!imageFile) {
       setError("Vui lòng chọn ảnh");
+      return;
+    }
+    if (!wardrobeId) {
+      setError("Vui lòng chọn tủ đồ");
       return;
     }
     if (!category) {
@@ -88,6 +162,7 @@ export function AddItemPage() {
 
       // Create wardrobe item
       await createMutation.mutateAsync({
+        wardrobeId,
         imageUrl,
         category,
         color,
@@ -117,12 +192,17 @@ export function AddItemPage() {
 
       <form onSubmit={handleSubmit}>
         {/* Image Section */}
-        <div className={styles.imageSection}>
+        <div
+          className={styles.imageSection}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+        >
           <input
             ref={fileInputRef}
             type="file"
             accept="image/*"
             onChange={handleFileSelect}
+            style={{ display: "none" }}
           />
 
           {imagePreview ? (
@@ -136,9 +216,8 @@ export function AddItemPage() {
               className={styles.imagePlaceholder}
               onClick={() => fileInputRef.current?.click()}
             >
-              <span className={styles.placeholderIcon}>📷</span>
               <span className={styles.placeholderText}>
-                Chọn ảnh từ thư viện
+                Chọn ảnh, kéo thả hoặc dán (Ctrl+V)
               </span>
             </div>
           )}
@@ -152,11 +231,54 @@ export function AddItemPage() {
               >
                 Chọn ảnh khác
               </button>
+              <button
+                type="button"
+                className={`${styles.imageActionBtn} ${styles.removeBgBtn} ${
+                  bgRemoved ? styles.done : ""
+                }`}
+                onClick={handleRemoveBackground}
+                disabled={isRemovingBg || bgRemoved}
+              >
+                {isRemovingBg
+                  ? "Đang xử lý..."
+                  : bgRemoved
+                  ? "✓ Đã xóa nền"
+                  : "Xóa nền"}
+              </button>
             </div>
           )}
         </div>
 
         <div className={styles.form}>
+          {/* Wardrobe Selection */}
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              Tủ đồ <span className={styles.required}>*</span>
+            </label>
+            {loadingWardrobes ? (
+              <div className={styles.loading}>Đang tải...</div>
+            ) : wardrobes && wardrobes.length > 0 ? (
+              <select
+                className={styles.select}
+                value={wardrobeId}
+                onChange={(e) => setWardrobeId(e.target.value)}
+                required
+              >
+                <option value="">Chọn tủ đồ</option>
+                {wardrobes.map((w) => (
+                  <option key={w.id} value={w.id}>
+                    {w.name} (
+                    {w.visibility === "public" ? "Công khai" : "Riêng tư"})
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <div className={styles.noWardrobes}>
+                Bạn chưa có tủ đồ nào. <a href="/wardrobes">Tạo tủ đồ mới</a>
+              </div>
+            )}
+          </div>
+
           {/* Category */}
           <div className={styles.formGroup}>
             <label className={styles.label}>
@@ -172,9 +294,6 @@ export function AddItemPage() {
                   }`}
                   onClick={() => setCategory(cat)}
                 >
-                  <div className={styles.categoryIcon}>
-                    {CATEGORY_ICONS[cat]}
-                  </div>
                   <div className={styles.categoryLabel}>
                     {CATEGORY_LABELS[cat]}
                   </div>

@@ -2,7 +2,12 @@ import { z } from "zod";
 import { itemCategorySchema } from "./wardrobe.schema";
 
 export const listingConditionSchema = z.enum(["new", "like_new", "used"]);
-export const listingStatusSchema = z.enum(["active", "sold", "removed"]);
+export const listingStatusSchema = z.enum([
+  "active",
+  "sold",
+  "removed",
+  "cancelled",
+]);
 export const listingSortBySchema = z.enum([
   "newest",
   "price_asc",

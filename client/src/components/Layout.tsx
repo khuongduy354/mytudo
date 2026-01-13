@@ -15,10 +15,11 @@ export function Layout() {
     <div className={styles.layout}>
       <header className={styles.header}>
         <div className={styles.logo}>
-          <Link to="/">👗 MYTuDo</Link>
+          <Link to="/">MYTuDo</Link>
         </div>
         <nav className={styles.nav}>
           <Link to="/">Tủ đồ</Link>
+          <Link to="/wardrobes">Quản lý tủ</Link>
           <Link to="/marketplace">Chợ đồ</Link>
           <Link to="/my-listings">Đang bán</Link>
           <Link to="/wishlist">Yêu thích</Link>

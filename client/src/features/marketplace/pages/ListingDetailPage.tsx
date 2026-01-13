@@ -51,7 +51,7 @@ export function ListingDetailPage() {
               alt={listing.wardrobeItem.name ?? "Sản phẩm"}
             />
           ) : (
-            <div className={styles.noImage}>👗</div>
+            <div className={styles.noImage}></div>
           )}
         </div>
 
@@ -97,7 +97,7 @@ export function ListingDetailPage() {
 
           {listing.seller && (
             <div className={styles.seller}>
-              <div className={styles.sellerAvatar}>👤</div>
+              <div className={styles.sellerAvatar}></div>
               <div className={styles.sellerInfo}>
                 <span className={styles.sellerLabel}>Người bán</span>
                 <span className={styles.sellerName}>
@@ -113,9 +113,9 @@ export function ListingDetailPage() {
               onClick={() => addToWishlist.mutate()}
               disabled={addToWishlist.isPending}
             >
-              ❤️ Yêu thích
+              Yêu thích
             </button>
-            <button className={styles.contactBtn}>💬 Liên hệ</button>
+            <button className={styles.contactBtn}>Liên hệ</button>
           </div>
         </div>
       </div>

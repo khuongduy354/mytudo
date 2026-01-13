@@ -29,7 +29,7 @@ export function WishlistPage() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1>❤️ Yêu thích</h1>
+        <h1>Yêu thích</h1>
       </div>
 
       {isLoading && <div className={styles.loading}>Đang tải...</div>}
@@ -51,20 +51,19 @@ export function WishlistPage() {
 
       {!isLoading && !error && wishlistItems.length > 0 && (
         <div className={styles.grid}>
-          {wishlistItems.map((item) => {
-            const listing = item.listing;
+          {wishlistItems.map((listing) => {
             const isUnavailable = listing?.status !== "active";
 
             return (
               <div
-                key={item.id}
+                key={listing.id}
                 className={`${styles.wishlistCard} ${
                   isUnavailable ? styles.unavailable : ""
                 }`}
               >
                 <button
                   className={styles.removeBtn}
-                  onClick={(e) => handleRemove(item.id, e)}
+                  onClick={(e) => handleRemove(listing.id, e)}
                   title="Xóa khỏi yêu thích"
                 >
                   ✕
@@ -76,10 +75,7 @@ export function WishlistPage() {
                   </span>
                 )}
 
-                <Link
-                  to={listing ? `/listing/${listing.id}` : "#"}
-                  className={styles.cardLink}
-                >
+                <Link to={`/listing/${listing.id}`} className={styles.cardLink}>
                   <div className={styles.imageWrapper}>
                     {listing?.wardrobeItem?.imageUrl ? (
                       <img
@@ -87,7 +83,7 @@ export function WishlistPage() {
                         alt={listing.wardrobeItem.name ?? "Sản phẩm"}
                       />
                     ) : (
-                      <div className={styles.noImage}>👗</div>
+                      <div className={styles.noImage}></div>
                     )}
                   </div>
                   <div className={styles.cardContent}>
@@ -97,14 +93,12 @@ export function WishlistPage() {
                     <p className={styles.cardCategory}>
                       {listing?.wardrobeItem?.category}
                     </p>
-                    {listing && (
-                      <p className={styles.cardPrice}>
-                        {formatPrice(listing.price)}
-                      </p>
-                    )}
+                    <p className={styles.cardPrice}>
+                      {formatPrice(listing.price)}
+                    </p>
                     {listing?.seller && (
                       <p className={styles.sellerName}>
-                        👤 {listing.seller.fullName}
+                        {listing.seller.fullName}
                       </p>
                     )}
                   </div>

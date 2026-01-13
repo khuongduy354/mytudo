@@ -151,4 +151,52 @@ Axios with interceptors for:
 | `zustand` | Client state |
 | `@tanstack/react-query` | Server state |
 | `react-router-dom` | Routing |
-| `@imgly/background-removal` | Image processing |
+| `@imgly/background-removal` | Image background removal |
+
+---
+
+## Database Schema
+
+```
+┌─────────────────┐     ┌─────────────────┐
+│     users       │     │    wardrobes    │
+├─────────────────┤     ├─────────────────┤
+│ id              │◄────│ user_id         │
+│ phone           │     │ id              │
+│ name            │     │ name            │
+│ avatar_url      │     │ visibility      │ (public/private)
+└─────────────────┘     └────────┬────────┘
+                                 │
+                                 ▼
+                        ┌─────────────────┐
+                        │ wardrobe_items  │
+                        ├─────────────────┤
+                        │ id              │
+                        │ wardrobe_id     │────┐
+                        │ user_id         │    │
+                        │ category        │    │
+                        │ color           │    │
+                        │ image_url       │    │
+                        └────────┬────────┘    │
+                                 │             │
+        ┌────────────────────────┘             │
+        ▼                                      │
+┌─────────────────┐     ┌─────────────────┐   │
+│    listings     │     │     orders      │   │
+├─────────────────┤     ├─────────────────┤   │
+│ id              │◄────│ listing_id      │   │
+│ wardrobe_item_id│     │ id              │   │
+│ seller_id       │     │ buyer_id        │   │
+│ price           │     │ seller_id       │   │
+│ status          │     │ status          │   │
+│ (active/sold)   │     │ (pending/       │   │
+└─────────────────┘     │  accepted/      │   │
+                        │  rejected/      │   │
+                        │  completed/     │   │
+                        │  cancelled)     │   │
+                        │ wardrobe_id     │───┘
+                        └─────────────────┘
+                         (buyer target wardrobe)
+```
+
+Order flow: Place order → Seller accepts → Complete → Item transferred to buyer's wardrobe

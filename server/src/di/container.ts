@@ -60,6 +60,7 @@ export const DI_KEYS = {
   WARDROBE_MODEL: "WardrobeModel",
   LISTING_MODEL: "ListingModel",
   WISHLIST_MODEL: "WishlistModel",
+  ORDER_MODEL: "OrderModel",
 
   // Services
   AUTH_SERVICE: "AuthService",
@@ -67,6 +68,7 @@ export const DI_KEYS = {
   LISTING_SERVICE: "ListingService",
   WISHLIST_SERVICE: "WishlistService",
   UPLOAD_SERVICE: "UploadService",
+  ORDER_SERVICE: "OrderService",
 
   // Controllers
   AUTH_CONTROLLER: "AuthController",
@@ -74,4 +76,5 @@ export const DI_KEYS = {
   LISTING_CONTROLLER: "ListingController",
   WISHLIST_CONTROLLER: "WishlistController",
   UPLOAD_CONTROLLER: "UploadController",
+  ORDER_CONTROLLER: "OrderController",
 } as const;

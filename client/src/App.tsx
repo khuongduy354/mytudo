@@ -6,6 +6,9 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { LoginPage } from "./features/auth/pages/LoginPage";
 import { WardrobePage } from "./features/wardrobe/pages/WardrobePage";
 import { AddItemPage } from "./features/wardrobe/pages/AddItemPage";
+import { WardrobeItemDetailPage } from "./features/wardrobe/pages/WardrobeItemDetailPage";
+import { WardrobesPage } from "./features/wardrobe/pages/WardrobesPage";
+import { EditWardrobePage } from "./features/wardrobe/pages/EditWardrobePage";
 import { MarketplacePage } from "./features/marketplace/pages/MarketplacePage";
 import { ListingDetailPage } from "./features/marketplace/pages/ListingDetailPage";
 import { SellItemPage } from "./features/listings/pages/SellItemPage";
@@ -24,8 +27,19 @@ function App() {
         <Route element={<Layout />}>
           {/* Wardrobe */}
           <Route path="/" element={<WardrobePage />} />
-          <Route path="/add-item" element={<AddItemPage />} />
+          <Route path="/wardrobe/add" element={<AddItemPage />} />
+          <Route
+            path="/wardrobe/:itemId"
+            element={<WardrobeItemDetailPage />}
+          />
           <Route path="/sell/:wardrobeItemId" element={<SellItemPage />} />
+
+          {/* Wardrobes Management */}
+          <Route path="/wardrobes" element={<WardrobesPage />} />
+          <Route
+            path="/wardrobes/:wardrobeId/edit"
+            element={<EditWardrobePage />}
+          />
 
           {/* Marketplace */}
           <Route path="/marketplace" element={<MarketplacePage />} />

@@ -68,7 +68,7 @@ export function SellItemPage() {
       </Link>
 
       <div className={styles.header}>
-        <h1>💰 Đăng bán</h1>
+        <h1>Đăng bán</h1>
         <p>Đặt giá và mô tả cho sản phẩm của bạn</p>
       </div>
 
@@ -77,7 +77,7 @@ export function SellItemPage() {
           {item.imageUrl ? (
             <img src={item.imageUrl} alt={item.name ?? "Sản phẩm"} />
           ) : (
-            <div className={styles.noImage}>👗</div>
+            <div className={styles.noImage}></div>
           )}
         </div>
         <div className={styles.itemInfo}>

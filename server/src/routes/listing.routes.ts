@@ -4,6 +4,7 @@ import { ListingController } from "../controllers/listing.controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { validateRequest } from "../middleware/validation.middleware.js";
 import { createListingSchema, updateListingSchema } from "@mytudo/shared";
+import type { ISupabaseClient } from "../di/supabase.js";
 
 export function createListingRouter(container: DIContainer): Router {
   const router = Router();
@@ -40,17 +41,27 @@ export function createMarketplaceRouter(container: DIContainer): Router {
   );
 
   // Optional auth for marketplace (to get wishlist status)
-  const optionalAuth = (req: any, res: any, next: any) => {
+  // This doesn't fail if auth is invalid - it just proceeds without userId
+  const optionalAuth = async (req: any, res: any, next: any) => {
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith("Bearer ")) {
-      // Try to authenticate but don't fail if invalid
-      authenticate(req, res, (err: any) => {
-        // Proceed regardless of auth result
-        next();
-      });
-    } else {
-      next();
+      const token = authHeader.split(" ")[1];
+      try {
+        const supabase = container.resolve<ISupabaseClient>(
+          DI_KEYS.SUPABASE_CLIENT
+        );
+        const {
+          data: { user },
+        } = await supabase.getClient().auth.getUser(token);
+        if (user) {
+          req.userId = user.id;
+          req.user = user;
+        }
+      } catch {
+        // Ignore auth errors for optional auth
+      }
     }
+    next();
   };
 
   router.get("/", optionalAuth, controller.getMarketplace);

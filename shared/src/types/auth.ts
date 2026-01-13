@@ -1,4 +1,11 @@
-// Auth types
+// Auth types - derived from schemas
+import type {
+  LoginWithEmailInput,
+  RegisterWithEmailInput,
+  SendMagicLinkInput,
+  UpdateProfileInput,
+  RefreshTokenInput,
+} from "../schemas/auth.schema";
 
 export interface UserProfile {
   id: string;
@@ -10,22 +17,12 @@ export interface UserProfile {
   updatedAt: string;
 }
 
-// Email/password auth
-export interface LoginWithEmailRequest {
-  email: string;
-  password: string;
-}
+// Email/password auth - derived from schemas
+export type LoginWithEmailRequest = LoginWithEmailInput;
+export type RegisterWithEmailRequest = RegisterWithEmailInput;
 
-export interface RegisterWithEmailRequest {
-  email: string;
-  password: string;
-  fullName?: string;
-}
-
-// Magic link (passwordless email login)
-export interface SendMagicLinkRequest {
-  email: string;
-}
+// Magic link (passwordless email login) - derived from schemas
+export type SendMagicLinkRequest = SendMagicLinkInput;
 
 export interface SendMagicLinkResponse {
   message: string;
@@ -40,11 +37,8 @@ export interface AuthResponse extends AuthTokens {
   user: UserProfile;
 }
 
-export interface UpdateProfileRequest {
-  fullName?: string;
-  avatarUrl?: string;
-}
+// Profile update - derived from schemas
+export type UpdateProfileRequest = UpdateProfileInput;
 
-export interface RefreshTokenRequest {
-  refreshToken: string;
-}
+// Refresh token - derived from schemas
+export type RefreshTokenRequest = RefreshTokenInput;

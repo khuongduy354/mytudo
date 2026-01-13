@@ -67,7 +67,7 @@ export function WardrobePage() {
         <div className={styles.loading}>Đang tải...</div>
       ) : items.length === 0 ? (
         <div className={styles.empty}>
-          <div className={styles.emptyIcon}>👕</div>
+          <div className={styles.emptyIcon}></div>
           <p className={styles.emptyText}>Tủ đồ trống</p>
           <p className={styles.emptySubtext}>
             Thêm món đồ đầu tiên để bắt đầu số hóa tủ đồ!

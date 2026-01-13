@@ -52,7 +52,7 @@ export function ProfilePage() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <div className={styles.avatar}>👤</div>
+        <div className={styles.avatar}></div>
         <h1>{user?.fullName || "Người dùng"}</h1>
         <p className={styles.phone}>{user?.phone}</p>
       </div>
@@ -73,7 +73,7 @@ export function ProfilePage() {
       </div>
 
       <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>📝 Thông tin cá nhân</h3>
+        <h3 className={styles.sectionTitle}>Thông tin cá nhân</h3>
 
         <div className={styles.formGroup}>
           <label>Số điện thoại</label>
@@ -100,11 +100,10 @@ export function ProfilePage() {
       </div>
 
       <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>⚙️ Cài đặt</h3>
+        <h3 className={styles.sectionTitle}>Cài đặt</h3>
 
         <div className={styles.menuItem}>
           <div className={styles.menuItemLeft}>
-            <span className={styles.menuIcon}>🔔</span>
             <span className={styles.menuLabel}>Thông báo</span>
           </div>
           <span className={styles.menuArrow}>›</span>
@@ -112,7 +111,6 @@ export function ProfilePage() {
 
         <div className={styles.menuItem}>
           <div className={styles.menuItemLeft}>
-            <span className={styles.menuIcon}>🔒</span>
             <span className={styles.menuLabel}>Bảo mật</span>
           </div>
           <span className={styles.menuArrow}>›</span>
@@ -120,7 +118,6 @@ export function ProfilePage() {
 
         <div className={styles.menuItem}>
           <div className={styles.menuItemLeft}>
-            <span className={styles.menuIcon}>❓</span>
             <span className={styles.menuLabel}>Trợ giúp</span>
           </div>
           <span className={styles.menuArrow}>›</span>

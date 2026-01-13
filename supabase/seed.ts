@@ -110,12 +110,44 @@ async function seedApplicationData(userIds: { [email: string]: string }) {
     console.log("✅ Seeded users");
   }
 
+  // Seed wardrobes for each user
+  const { data: wardrobes, error: wardrobesError } = await supabase
+    .from("wardrobes")
+    .insert([
+      {
+        user_id: user1Id,
+        name: "Tủ đồ chính",
+        visibility: "public",
+      },
+      {
+        user_id: user2Id,
+        name: "Tủ đồ chính",
+        visibility: "public",
+      },
+      {
+        user_id: user3Id,
+        name: "Tủ đồ chính",
+        visibility: "public",
+      },
+    ])
+    .select();
+
+  if (wardrobesError) {
+    console.error("❌ Error seeding wardrobes:", wardrobesError.message);
+    return;
+  } else {
+    console.log("✅ Seeded wardrobes");
+  }
+
+  const [wardrobe1, wardrobe2, wardrobe3] = wardrobes!;
+
   // Seed wardrobe items for User 1 (Minh Anh)
   const { data: wardrobeItems1, error: wardrobeError1 } = await supabase
     .from("wardrobe_items")
     .insert([
       {
         user_id: user1Id,
+        wardrobe_id: wardrobe1.id,
         image_url:
           "https://placehold.co/400x500/ffffff/333333?text=Ao+So+Mi+Trang",
         category: "tops",
@@ -128,6 +160,7 @@ async function seedApplicationData(userIds: { [email: string]: string }) {
       },
       {
         user_id: user1Id,
+        wardrobe_id: wardrobe1.id,
         image_url:
           "https://placehold.co/400x500/1a1a2e/ffffff?text=Quan+Tay+Den",
         category: "bottoms",
@@ -140,6 +173,7 @@ async function seedApplicationData(userIds: { [email: string]: string }) {
       },
       {
         user_id: user1Id,
+        wardrobe_id: wardrobe1.id,
         image_url: "https://placehold.co/400x500/ff6b6b/ffffff?text=Ao+Thun+Do",
         category: "tops",
         color: "red",
@@ -151,6 +185,7 @@ async function seedApplicationData(userIds: { [email: string]: string }) {
       },
       {
         user_id: user1Id,
+        wardrobe_id: wardrobe1.id,
         image_url: "https://placehold.co/400x500/4ecdc4/ffffff?text=Vay+Xanh",
         category: "bottoms",
         color: "blue",
@@ -173,6 +208,7 @@ async function seedApplicationData(userIds: { [email: string]: string }) {
   await supabase.from("wardrobe_items").insert([
     {
       user_id: user2Id,
+      wardrobe_id: wardrobe2.id,
       image_url:
         "https://placehold.co/400x500/f8b500/333333?text=Ao+Khoac+Vintage",
       category: "tops",
@@ -185,6 +221,7 @@ async function seedApplicationData(userIds: { [email: string]: string }) {
     },
     {
       user_id: user2Id,
+      wardrobe_id: wardrobe2.id,
       image_url:
         "https://placehold.co/400x500/2d3436/ffffff?text=Quan+Jean+Ong+Rong",
       category: "bottoms",
@@ -197,6 +234,7 @@ async function seedApplicationData(userIds: { [email: string]: string }) {
     },
     {
       user_id: user2Id,
+      wardrobe_id: wardrobe2.id,
       image_url: "https://placehold.co/400x500/e17055/ffffff?text=Tui+Xach+Da",
       category: "accessories",
       color: "brown",
@@ -207,6 +245,7 @@ async function seedApplicationData(userIds: { [email: string]: string }) {
     },
     {
       user_id: user2Id,
+      wardrobe_id: wardrobe2.id,
       image_url:
         "https://placehold.co/400x500/00b894/ffffff?text=Sneakers+Trang",
       category: "footwear",
@@ -225,6 +264,7 @@ async function seedApplicationData(userIds: { [email: string]: string }) {
   await supabase.from("wardrobe_items").insert([
     {
       user_id: user3Id,
+      wardrobe_id: wardrobe3.id,
       image_url: "https://placehold.co/400x500/dfe6e9/333333?text=Ao+Len+Xam",
       category: "tops",
       color: "gray",
@@ -236,6 +276,7 @@ async function seedApplicationData(userIds: { [email: string]: string }) {
     },
     {
       user_id: user3Id,
+      wardrobe_id: wardrobe3.id,
       image_url:
         "https://placehold.co/400x500/2d3436/ffffff?text=Quan+Culottes",
       category: "bottoms",
@@ -248,6 +289,7 @@ async function seedApplicationData(userIds: { [email: string]: string }) {
     },
     {
       user_id: user3Id,
+      wardrobe_id: wardrobe3.id,
       image_url: "https://placehold.co/400x500/b2bec3/333333?text=Giay+Loafer",
       category: "footwear",
       color: "beige",

@@ -6,6 +6,8 @@ import { validateRequest } from "../middleware/validation.middleware.js";
 import {
   createWardrobeItemSchema,
   updateWardrobeItemSchema,
+  createWardrobeSchema,
+  updateWardrobeSchema,
 } from "@mytudo/shared";
 
 export function createWardrobeRouter(container: DIContainer): Router {
@@ -17,6 +19,7 @@ export function createWardrobeRouter(container: DIContainer): Router {
   // All routes require authentication
   router.use(authenticate);
 
+  // Wardrobe items routes
   router.get("/", controller.getItems);
   router.get("/count", controller.getCount);
   router.get("/:id", controller.getItem);
@@ -34,6 +37,24 @@ export function createWardrobeRouter(container: DIContainer): Router {
   );
 
   router.delete("/:id", controller.deleteItem);
+
+  // Wardrobes management routes
+  router.get("/wardrobes/list", controller.getWardrobes);
+  router.get("/wardrobes/:wardrobeId", controller.getWardrobe);
+
+  router.post(
+    "/wardrobes",
+    validateRequest(createWardrobeSchema),
+    controller.createWardrobe
+  );
+
+  router.put(
+    "/wardrobes/:wardrobeId",
+    validateRequest(updateWardrobeSchema),
+    controller.updateWardrobe
+  );
+
+  router.delete("/wardrobes/:wardrobeId", controller.deleteWardrobe);
 
   return router;
 }

@@ -98,7 +98,7 @@ export function LoginPage() {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h1 className={styles.logo}>👗 MYTuDo</h1>
+        <h1 className={styles.logo}>MYTuDo</h1>
         <p className={styles.tagline}>Tủ đồ số & Chợ thời trang bền vững</p>
 
         {isDev && mode === "login" && (

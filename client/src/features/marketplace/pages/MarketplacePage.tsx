@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMarketplace } from "../hooks/useMarketplace";
+import { wishlistApi } from "../../../api";
 import type { ItemCategory } from "@mytudo/shared";
 import styles from "./MarketplacePage.module.css";
 
@@ -23,20 +25,52 @@ export function MarketplacePage() {
   const [category, setCategory] = useState<ItemCategory | "">("");
   const [minPrice, setMinPrice] = useState<string>("");
   const [maxPrice, setMaxPrice] = useState<string>("");
+  const queryClient = useQueryClient();
 
-  const { data, isLoading, error } = useMarketplace({
+  const { data, isLoading, error, refetch } = useMarketplace({
     category: category || undefined,
     status: "active",
     minPrice: minPrice ? Number(minPrice) : undefined,
     maxPrice: maxPrice ? Number(maxPrice) : undefined,
   });
 
+  const addToWishlist = useMutation({
+    mutationFn: (listingId: string) => wishlistApi.addToWishlist(listingId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
+      refetch();
+    },
+  });
+
+  const removeFromWishlist = useMutation({
+    mutationFn: (listingId: string) =>
+      wishlistApi.removeFromWishlist(listingId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
+      refetch();
+    },
+  });
+
+  const handleWishlistToggle = (
+    e: React.MouseEvent,
+    listingId: string,
+    isWishlisted: boolean
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isWishlisted) {
+      removeFromWishlist.mutate(listingId);
+    } else {
+      addToWishlist.mutate(listingId);
+    }
+  };
+
   const listings = data?.data || [];
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1>🛒 Chợ đồ</h1>
+        <h1>Chợ đồ</h1>
       </div>
 
       <div className={styles.filters}>
@@ -104,8 +138,25 @@ export function MarketplacePage() {
                     alt={listing.wardrobeItem.name ?? "Sản phẩm"}
                   />
                 ) : (
-                  <div className={styles.noImage}>👗</div>
+                  <div className={styles.noImage}></div>
                 )}
+                <button
+                  className={`${styles.wishlistBtn} ${
+                    listing.isWishlisted ? styles.wishlisted : ""
+                  }`}
+                  onClick={(e) =>
+                    handleWishlistToggle(
+                      e,
+                      listing.id,
+                      listing.isWishlisted || false
+                    )
+                  }
+                  disabled={
+                    addToWishlist.isPending || removeFromWishlist.isPending
+                  }
+                >
+                  {listing.isWishlisted ? "♥" : "♡"}
+                </button>
               </div>
               <div className={styles.cardContent}>
                 <h3 className={styles.cardTitle}>
@@ -117,7 +168,6 @@ export function MarketplacePage() {
                 <p className={styles.cardPrice}>{formatPrice(listing.price)}</p>
                 {listing.seller && (
                   <div className={styles.seller}>
-                    <span>👤</span>
                     <span>{listing.seller.fullName}</span>
                   </div>
                 )}

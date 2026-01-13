@@ -5,6 +5,9 @@ import type {
   UpdateWardrobeItemRequest,
   WardrobeFilters,
   PaginatedResponse,
+  Wardrobe,
+  CreateWardrobeRequest,
+  UpdateWardrobeRequest,
 } from "@mytudo/shared";
 
 export const wardrobeApi = {
@@ -51,5 +54,33 @@ export const wardrobeApi = {
   getCount: async (): Promise<number> => {
     const response = await apiClient.get("/wardrobe/count");
     return response.data.data.count;
+  },
+
+  // Wardrobe management
+  getWardrobes: async (): Promise<Wardrobe[]> => {
+    const response = await apiClient.get("/wardrobe/wardrobes/list");
+    return response.data.data;
+  },
+
+  getWardrobe: async (id: string): Promise<Wardrobe> => {
+    const response = await apiClient.get(`/wardrobe/wardrobes/${id}`);
+    return response.data.data;
+  },
+
+  createWardrobe: async (data: CreateWardrobeRequest): Promise<Wardrobe> => {
+    const response = await apiClient.post("/wardrobe/wardrobes", data);
+    return response.data.data;
+  },
+
+  updateWardrobe: async (
+    id: string,
+    data: UpdateWardrobeRequest
+  ): Promise<Wardrobe> => {
+    const response = await apiClient.put(`/wardrobe/wardrobes/${id}`, data);
+    return response.data.data;
+  },
+
+  deleteWardrobe: async (id: string): Promise<void> => {
+    await apiClient.delete(`/wardrobe/wardrobes/${id}`);
   },
 };

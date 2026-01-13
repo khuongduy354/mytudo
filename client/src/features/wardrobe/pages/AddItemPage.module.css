@@ -85,11 +85,30 @@
   background: white;
   cursor: pointer;
   font-size: 0.9rem;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background 0.2s;
 }
 
-.imageActionBtn:hover {
+.imageActionBtn:hover:not(:disabled) {
   border-color: #667eea;
+}
+
+.imageActionBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.removeBgBtn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+}
+
+.removeBgBtn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.removeBgBtn.done {
+  background: #22c55e;
 }
 
 .form {
@@ -111,6 +130,47 @@
 
 .required {
   color: #ef4444;
+}
+
+.select {
+  padding: 0.75rem;
+  border: 2px solid #eee;
+  border-radius: 0.5rem;
+  background: white;
+  font-size: 1rem;
+  color: #333;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.select:hover {
+  border-color: #667eea;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.loading {
+  padding: 0.75rem;
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.noWardrobes {
+  padding: 0.75rem;
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 0.5rem;
+  color: #856404;
+  font-size: 0.9rem;
+}
+
+.noWardrobes a {
+  color: #667eea;
+  text-decoration: underline;
 }
 
 .categoryGrid {
