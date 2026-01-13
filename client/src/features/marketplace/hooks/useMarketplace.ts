@@ -13,6 +13,8 @@ export function useMarketplace(filters?: {
   return useQuery({
     queryKey: ["marketplace", filters],
     queryFn: () => marketplaceApi.getListings(filters),
+    staleTime: 0, // Always fetch fresh data
+    gcTime: 0, // Don't cache in garbage collection
   });
 }
 

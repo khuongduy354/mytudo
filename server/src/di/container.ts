@@ -54,6 +54,7 @@ export const container = new DIContainer();
 export const DI_KEYS = {
   // Infrastructure
   SUPABASE_CLIENT: "SupabaseClient",
+  SUPABASE_AUTH_CLIENT: "SupabaseAuthClient",
 
   // Models
   USER_MODEL: "UserModel",

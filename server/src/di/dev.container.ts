@@ -1,5 +1,9 @@
 import { container, DI_KEYS, DIContainer } from "./container.js";
-import { DevSupabaseClient, ISupabaseClient } from "./supabase.js";
+import {
+  DevSupabaseClient,
+  DevSupabaseAuthClient,
+  ISupabaseClient,
+} from "./supabase.js";
 
 // Models
 import { UserModel } from "../models/user.model.js";
@@ -31,6 +35,11 @@ export function createDevContainer(): DIContainer {
   container.registerFactory(
     DI_KEYS.SUPABASE_CLIENT,
     () => new DevSupabaseClient()
+  );
+
+  container.registerFactory(
+    DI_KEYS.SUPABASE_AUTH_CLIENT,
+    () => new DevSupabaseAuthClient()
   );
 
   // Models

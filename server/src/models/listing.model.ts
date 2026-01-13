@@ -192,8 +192,18 @@ export class ListingModel {
     } = filters;
     const offset = (page - 1) * limit;
 
-    let query = this.supabase
-      .getClient()
+    // DEBUG: Check Supabase client auth state
+    const client = this.supabase.getClient();
+    const { data: sessionData } = await client.auth.getSession();
+    console.log(
+      "DEBUG marketplace - Supabase session:",
+      sessionData.session ? "EXISTS" : "NULL"
+    );
+    if (sessionData.session) {
+      console.log("DEBUG - Session user:", sessionData.session.user.id);
+    }
+
+    let query = client
       .from("listings")
       .select(
         `
@@ -252,6 +262,27 @@ export class ListingModel {
 
     if (error) throw new Error(`Failed to fetch marketplace: ${error.message}`);
 
+    console.log(
+      "DEBUG marketplace - Raw query returned:",
+      data?.length || 0,
+      "items"
+    );
+    if (data && data.length > 0) {
+      console.log(
+        "DEBUG - First item structure:",
+        JSON.stringify(
+          {
+            hasWardrobeItems: !!data[0].wardrobe_items,
+            hasUsers: !!data[0].users,
+            wardrobeItems: data[0].wardrobe_items,
+            users: data[0].users,
+          },
+          null,
+          2
+        )
+      );
+    }
+
     // Get wishlist status for all items
     let wishlistedIds: Set<string> = new Set();
     if (currentUserId && data && data.length > 0) {
@@ -269,8 +300,12 @@ export class ListingModel {
     const items: ListingWithDetails[] = (data || [])
       .filter((item) => {
         // Filter out invalid data and non-public wardrobes
-        if (!item.wardrobe_items || !item.users) return false;
-        if (!item.wardrobe_items.wardrobes) return false;
+        if (!item.wardrobe_items || !item.users) {
+          return false;
+        }
+        if (!item.wardrobe_items.wardrobes) {
+          return false;
+        }
         return item.wardrobe_items.wardrobes.visibility === "public";
       })
       .map((item) => ({
