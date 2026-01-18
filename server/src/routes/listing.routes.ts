@@ -44,16 +44,8 @@ export function createMarketplaceRouter(container: DIContainer): Router {
   // This doesn't fail if auth is invalid - it just proceeds without userId
   const optionalAuth = async (req: any, res: any, next: any) => {
     const authHeader = req.headers.authorization;
-    console.log(
-      "DEBUG optionalAuth - Auth header:",
-      authHeader ? "present" : "absent"
-    );
     if (authHeader && authHeader.startsWith("Bearer ")) {
       const token = authHeader.split(" ")[1];
-      console.log(
-        "DEBUG optionalAuth - Token:",
-        token.substring(0, 20) + "..."
-      );
       try {
         const supabase = container.resolve<ISupabaseClient>(
           DI_KEYS.SUPABASE_CLIENT
@@ -61,23 +53,15 @@ export function createMarketplaceRouter(container: DIContainer): Router {
         const {
           data: { user },
         } = await supabase.getClient().auth.getUser(token);
-        console.log(
-          "DEBUG optionalAuth - User from token:",
-          user ? user.id : "null"
-        );
         if (user) {
           req.userId = user.id;
           req.user = user;
         }
       } catch (error) {
         // Ignore auth errors for optional auth
-        console.log("DEBUG optionalAuth - Auth error:", error);
+        console.warn("DEBUG optionalAuth - Auth error:", error);
       }
     }
-    console.log(
-      "DEBUG optionalAuth - Final req.userId:",
-      req.userId || "undefined"
-    );
     next();
   };
 

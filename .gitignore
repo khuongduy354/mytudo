@@ -4,4 +4,6 @@ duydevlog
 *node_modules*
 
 .vscode
-*dist*
+*dist* 
+
+.venv
