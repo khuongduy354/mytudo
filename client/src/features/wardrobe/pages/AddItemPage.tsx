@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { removeBackground } from "@imgly/background-removal";
 import { Button } from "../../../components/Button";
 import { Input } from "../../../components/Input";
 import { useCreateWardrobeItem, useWardrobes } from "../hooks/useWardrobe";
@@ -35,11 +34,15 @@ export function AddItemPage() {
   const { data: wardrobes, isLoading: loadingWardrobes } = useWardrobes();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [originalFile, setOriginalFile] = useState<File | null>(null);
+  const [originalPreview, setOriginalPreview] = useState<string | null>(null);
+  const [processedFile, setProcessedFile] = useState<File | null>(null);
+  const [processedPreview, setProcessedPreview] = useState<string | null>(null);
+  const [selectedVersion, setSelectedVersion] = useState<
+    "original" | "processed"
+  >("original");
   const [isUploading, setIsUploading] = useState(false);
   const [isRemovingBg, setIsRemovingBg] = useState(false);
-  const [bgRemoved, setBgRemoved] = useState(false);
 
   const [wardrobeId, setWardrobeId] = useState<string>("");
   const [category, setCategory] = useState<ItemCategory | null>(null);
@@ -54,9 +57,11 @@ export function AddItemPage() {
 
   const processFile = (file: File) => {
     if (file.type.startsWith("image/")) {
-      setImageFile(file);
-      setImagePreview(URL.createObjectURL(file));
-      setBgRemoved(false);
+      setOriginalFile(file);
+      setOriginalPreview(URL.createObjectURL(file));
+      setProcessedFile(null);
+      setProcessedPreview(null);
+      setSelectedVersion("original");
     }
   };
 
@@ -106,24 +111,16 @@ export function AddItemPage() {
   }, []);
 
   const handleRemoveBackground = async () => {
-    if (!imageFile) return;
+    if (!originalFile) return;
 
     try {
       setIsRemovingBg(true);
       setError(null);
 
-      const blob = await removeBackground(imageFile);
-      const processedFile = new File(
-        [blob],
-        imageFile.name.replace(/\.[^/.]+$/, ".png"),
-        {
-          type: "image/png",
-        }
-      );
-
-      setImageFile(processedFile);
-      setImagePreview(URL.createObjectURL(processedFile));
-      setBgRemoved(true);
+      const result = await uploadApi.removeBackground(originalFile);
+      setProcessedFile(result);
+      setProcessedPreview(URL.createObjectURL(result));
+      setSelectedVersion("processed");
     } catch (err) {
       setError("Không thể xóa nền ảnh. Vui lòng thử lại.");
       console.error("Background removal error:", err);
@@ -137,7 +134,7 @@ export function AddItemPage() {
     setError(null);
 
     // Validation
-    if (!imageFile) {
+    if (!originalFile) {
       setError("Vui lòng chọn ảnh");
       return;
     }
@@ -157,8 +154,12 @@ export function AddItemPage() {
     try {
       setIsUploading(true);
 
-      // Upload image first
-      const imageUrl = await uploadApi.uploadImage(imageFile);
+      // Upload the selected version (original or processed)
+      const fileToUpload =
+        selectedVersion === "processed" && processedFile
+          ? processedFile
+          : originalFile;
+      const imageUrl = await uploadApi.uploadImage(fileToUpload);
 
       // Create wardrobe item
       await createMutation.mutateAsync({
@@ -205,9 +206,13 @@ export function AddItemPage() {
             style={{ display: "none" }}
           />
 
-          {imagePreview ? (
+          {originalPreview ? (
             <img
-              src={imagePreview}
+              src={
+                selectedVersion === "processed" && processedPreview
+                  ? processedPreview
+                  : originalPreview
+              }
               alt="Preview"
               className={styles.imagePreview}
             />
@@ -222,7 +227,7 @@ export function AddItemPage() {
             </div>
           )}
 
-          {imagePreview && (
+          {originalPreview && (
             <div className={styles.imageActions}>
               <button
                 type="button"
@@ -234,16 +239,39 @@ export function AddItemPage() {
               <button
                 type="button"
                 className={`${styles.imageActionBtn} ${styles.removeBgBtn} ${
-                  bgRemoved ? styles.done : ""
+                  processedFile ? styles.done : ""
                 }`}
                 onClick={handleRemoveBackground}
-                disabled={isRemovingBg || bgRemoved}
+                disabled={isRemovingBg || !!processedFile}
               >
                 {isRemovingBg
                   ? "Đang xử lý..."
-                  : bgRemoved
-                  ? "✓ Đã xóa nền"
-                  : "Xóa nền"}
+                  : processedFile
+                    ? "✓ Đã xóa nền"
+                    : "Xóa nền"}
+              </button>
+            </div>
+          )}
+
+          {processedFile && (
+            <div className={styles.versionSelector}>
+              <button
+                type="button"
+                className={`${styles.versionBtn} ${
+                  selectedVersion === "original" ? styles.active : ""
+                }`}
+                onClick={() => setSelectedVersion("original")}
+              >
+                Ảnh gốc
+              </button>
+              <button
+                type="button"
+                className={`${styles.versionBtn} ${
+                  selectedVersion === "processed" ? styles.active : ""
+                }`}
+                onClick={() => setSelectedVersion("processed")}
+              >
+                Đã xóa nền
               </button>
             </div>
           )}

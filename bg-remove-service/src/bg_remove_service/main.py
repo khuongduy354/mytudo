@@ -1,14 +1,78 @@
-# Use a pipeline as a high-level helper
+from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi.responses import Response
+from fastapi.middleware.cors import CORSMiddleware
 import torch
 from transformers import pipeline
+from PIL import Image
+import io
+
+# Initialize FastAPI app
+app = FastAPI(title="Background Removal Service")
+
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Use GPU if available, otherwise CPU
 device = 0 if torch.cuda.is_available() else -1
 
-pipe = pipeline("image-segmentation", model="briaai/RMBG-1.4", trust_remote_code=True, device=device, use_fast=True)
+# Initialize the background removal pipeline
+pipe = pipeline(
+    "image-segmentation",
+    model="briaai/RMBG-1.4",
+    trust_remote_code=True,
+    device=device,
+    use_fast=True
+)
 
-image_path = "https://farm5.staticflickr.com/4007/4322154488_997e69e4cf_z.jpg"
-pillow_mask = pipe(image_path, return_mask = True) # outputs a pillow mask
-pillow_image = pipe(image_path) # applies mask on input and returns a pillow image
 
-pillow_image.save("output.png")
+@app.get("/")
+async def root():
+    return {"message": "Background Removal Service is running"}
+
+
+@app.post("/remove-bg")
+async def remove_background(file: UploadFile = File(...)):
+    """
+    Remove background from uploaded image.
+    Returns the processed image as PNG with transparent background.
+    """
+    if not file.content_type or not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="File must be an image")
+
+    try:
+        # Read the uploaded file
+        contents = await file.read()
+        image = Image.open(io.BytesIO(contents))
+
+        # Remove background
+        result_image = pipe(image)
+
+        # Convert to bytes
+        img_byte_arr = io.BytesIO()
+        result_image.save(img_byte_arr, format="PNG")
+        img_byte_arr.seek(0)
+
+        return Response(
+            content=img_byte_arr.getvalue(),
+            media_type="image/png",
+            headers={
+                "Content-Disposition": f"attachment; filename=nobg_{file.filename}"
+            }
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to process image: {str(e)}"
+        )
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8001)

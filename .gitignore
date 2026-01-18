@@ -6,4 +6,5 @@ duydevlog
 .vscode
 *dist* 
 
+*.pyc
 .venv
