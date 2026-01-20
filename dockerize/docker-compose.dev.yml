@@ -1,0 +1,69 @@
+# Development environment docker-compose
+# Supabase stack runs separately in ./supabase directory
+
+services:
+  # Node.js API server
+  server:
+    build:
+      context: ..
+      dockerfile: server/Dockerfile.dev
+    container_name: mytudo-server-dev
+    ports:
+      - "${SERVER_PORT:-3001}:3000"
+    volumes:
+      - ../shared:/app/shared
+      - ../server:/app/server
+      - /app/node_modules
+      - /app/shared/node_modules
+      - /app/server/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - SUPABASE_URL=http://host.docker.internal:8000
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      - BG_REMOVE_SERVICE_URL=http://bg-remove:8000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - mytudo-network
+
+  # React/Vite client
+  client:
+    build:
+      context: ..
+      dockerfile: client/Dockerfile.dev
+    container_name: mytudo-client-dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ../shared:/app/shared
+      - ../client:/app/client
+      - /app/node_modules
+      - /app/shared/node_modules
+      - /app/client/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:${SERVER_PORT:-3001}
+      - VITE_SUPABASE_URL=http://localhost:8000
+      - VITE_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+    networks:
+      - mytudo-network
+
+  # Python background removal service
+  bg-remove:
+    build:
+      context: ../bg-remove-service
+      dockerfile: Dockerfile
+    container_name: mytudo-bg-remove-dev
+    ports:
+      - "${BG_REMOVE_PORT:-8001}:8000"
+    volumes:
+      - ../bg-remove-service/src:/app/src
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - mytudo-network
+
+networks:
+  mytudo-network:
+    driver: bridge

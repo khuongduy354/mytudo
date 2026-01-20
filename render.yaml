@@ -1,0 +1,58 @@
+# Render Blueprint for mytudo
+# Deploy all services to Render with one click
+
+services:
+  # Web Service - Client (Static Site)
+  - type: web
+    name: mytudo-client
+    env: docker
+    dockerfilePath: ./client/Dockerfile
+    dockerContext: .
+    routes:
+      - type: rewrite
+        source: /api/*
+        destination: https://mytudo-server.onrender.com/api/*
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://mytudo-server.onrender.com
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+
+  # Web Service - Server API
+  - type: web
+    name: mytudo-server
+    env: docker
+    dockerfilePath: ./server/Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: BG_REMOVE_SERVICE_URL
+        value: https://mytudo-bg-remove.onrender.com
+
+  # Web Service - Background Removal Service
+  - type: web
+    name: mytudo-bg-remove
+    env: docker
+    dockerfilePath: ./bg-remove-service/Dockerfile
+    dockerContext: ./bg-remove-service
+    healthCheckPath: /
+    plan: starter
+
+# Database - Use Supabase cloud instead of self-hosted
+# Configure Supabase project at https://supabase.com
+# Add SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_KEY to environment variables

@@ -12,11 +12,11 @@ export class DevSupabaseAuthClient implements ISupabaseClient {
   private client: SupabaseClientType;
 
   constructor() {
-    const supabaseUrl = process.env.DEV_SUPABASE_URL;
-    const supabaseKey = process.env.DEV_SUPABASE_ANON_KEY;
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
-      throw new Error("Missing DEV Supabase auth environment variables");
+      throw new Error("Missing Supabase auth environment variables");
     }
 
     this.client = createClient(supabaseUrl, supabaseKey, {
@@ -38,11 +38,11 @@ export class DevSupabaseClient implements ISupabaseClient {
   private client: SupabaseClientType;
 
   constructor() {
-    const supabaseUrl = process.env.DEV_SUPABASE_URL;
-    const supabaseKey = process.env.DEV_SUPABASE_SERVICE_ROLE_KEY;
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
-      throw new Error("Missing DEV Supabase environment variables");
+      throw new Error("Missing Supabase environment variables");
     }
 
     this.client = createClient(supabaseUrl, supabaseKey, {
@@ -89,7 +89,7 @@ export class ProdSupabaseClient implements ISupabaseClient {
 
   constructor() {
     const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
       throw new Error("Missing PROD Supabase environment variables");

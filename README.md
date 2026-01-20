@@ -10,6 +10,20 @@
 
 ## 🚀 Quick Start
 
+# Option 1: Docker (Recommended)
+```bash
+./dockerize/scripts/dev.sh
+```
+
+Access:
+- Client: http://localhost:5173
+- Server: http://localhost:3000
+- Supabase Studio: http://localhost:54323
+
+See [DOCKER.md](./dockerize/README.md) for full Docker guide.
+
+# Option 2: Local Development
+
 ### 1. Install Dependencies
 ```bash
 npm install
@@ -80,4 +94,31 @@ npm run build
 
 # Reset database
 npx supabase db reset
+```
+
+## 🐳 Docker Deployment
+
+Full Docker setup with dev, staging, and production environments.
+
+```bash
+# Development
+./dockerize/scripts/dev.sh
+
+# Staging
+./dockerize/scripts/stage.sh
+
+# Production
+./dockerize/scripts/prod.sh
+```
+
+See [DOCKER.md](./DOCKER.md) for comprehensive guide and [render.yaml](./render.yaml) for Render deployment.
+
+## 🚢 Deploy to Render
+
+1. Push to GitHub
+2. Connect repo in Render dashboard
+3. Configure environment variables (see dockerize/render/.env.template)
+4. Deploy using render.yaml blueprint
+
+See [dockerize/render/README.md](./dockerize/render/README.md) for details.
 ```

@@ -1,0 +1,72 @@
+# Production environment docker-compose
+# Supabase stack runs separately in ./supabase directory
+
+services:
+  # Node.js API server
+  server:
+    build:
+      context: ..
+      dockerfile: server/Dockerfile
+    container_name: mytudo-server-prod
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - SUPABASE_URL=http://host.docker.internal:8000
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      - BG_REMOVE_SERVICE_URL=http://bg-remove:8000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - mytudo-network
+    restart: always
+
+  # React/Vite client
+  client:
+    build:
+      context: ..
+      args:
+        - VITE_API_URL=/api
+        - VITE_SUPABASE_URL=${SUPABASE_URL}
+        - VITE_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+    container_name: mytudo-client-prod
+    depends_on:
+      - server
+    networks:
+      - mytudo-network
+    restart: always
+
+  # Python background removal service
+  bg-remove:
+    build:
+      context: ../bg-remove-service
+      dockerfile: Dockerfile
+    container_name: mytudo-bg-remove-prod
+    ports:
+      - "${BG_REMOVE_PORT:-8001}:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - mytudo-network
+    restart: always
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: mytudo-nginx-prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - client
+      - server
+    networks:
+      - mytudo-network
+    restart: always
+
+networks:
+  mytudo-network:
+    driver: bridge

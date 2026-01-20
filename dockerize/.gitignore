@@ -1,0 +1,17 @@
+# .gitignore additions for Docker
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Environment files
+dockerize/env/.env.dev
+dockerize/env/.env.stage
+dockerize/env/.env.prod
+dockerize/env/.env.local
+
+# Nginx SSL certificates
+dockerize/nginx/ssl/
+
+# Docker volumes
+.docker/
