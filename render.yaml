@@ -17,15 +17,14 @@ services:
     plan: free
     # Running from root to support workspaces
     rootDir: .
-    buildCommand: npm install && npm run build --workspace=server
-    startCommand: npm start --workspace=server
+    # Use --include=dev to ensure @types are installed for compilation
+    buildCommand: npm install --include=dev && npm run build --workspace=@mytudo/shared && npm run build --workspace=@mytudo/server
+    startCommand: npm start --workspace=@mytudo/server
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
-      # Add other environment variables here. 
-      # Set sync: false for secrets you want to manage in the Render Dashboard
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_ANON_KEY
@@ -40,8 +39,12 @@ services:
     runtime: python
     plan: free
     rootDir: bg-remove-service
-    buildCommand: pip install poetry && poetry install
-    startCommand: poetry run uvicorn bg_remove_service.main:app --host 0.0.0.0 --port $PORT
+    # Explicitly install poetry and dependencies
+    buildCommand: |
+      pip install poetry
+      poetry config virtualenvs.create false
+      poetry install --no-interaction --no-ansi
+    startCommand: uvicorn bg_remove_service.main:app --app-dir src --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
