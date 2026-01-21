@@ -1,0 +1,48 @@
+services:
+  # Frontend Client (Static Site)
+  - type: web
+    name: mytudo-client
+    env: static
+    buildCommand: npm install && npm run build --workspace=client
+    staticPublishPath: client/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    # Optional: basic plan to avoid free tier limits if desired, but default is sufficient
+    # plan: free
+
+  # Backend Server (Node.js)
+  - type: web
+    name: mytudo-server
+    runtime: node
+    # Running from root to support workspaces
+    rootDir: .
+    buildCommand: npm install && npm run build --workspace=server
+    startCommand: npm start --workspace=server
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      # Add other environment variables here. 
+      # Set sync: false for secrets you want to manage in the Render Dashboard
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+
+  # Background Removal Service (Python/FastAPI)
+  - type: web
+    name: mytudo-bg-service
+    runtime: python
+    rootDir: bg-remove-service
+    buildCommand: pip install poetry && poetry install
+    startCommand: poetry run uvicorn bg_remove_service.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: PORT
+        value: 8000
