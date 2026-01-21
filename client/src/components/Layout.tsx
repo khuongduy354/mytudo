@@ -15,11 +15,11 @@ export function Layout() {
   };
 
   const navLinks = [
-    { to: "/", label: "Tủ đồ", icon: "👗" },
-    { to: "/wardrobes", label: "Quản lý tủ", icon: "📦" },
-    { to: "/marketplace", label: "Chợ đồ", icon: "🛍️" },
-    { to: "/my-listings", label: "Đang bán", icon: "💰" },
-    { to: "/wishlist", label: "Yêu thích", icon: "❤️" },
+    { to: "/", label: "Tủ đồ" },
+    { to: "/wardrobes", label: "Quản lý tủ" },
+    { to: "/marketplace", label: "Chợ đồ" },
+    { to: "/my-listings", label: "Đang bán" },
+    { to: "/wishlist", label: "Yêu thích" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -48,19 +48,13 @@ export function Layout() {
                 <Link
                   key={link.to}
                   to={link.to}
-                  className={`group relative px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
+                  className={`relative px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
                     isActive(link.to)
-                      ? "text-primary bg-primary/10"
+                      ? "text-black bg-primary shadow-md"
                       : "text-foreground/70 hover:text-primary hover:bg-primary/5"
                   }`}
                 >
-                  <span className="flex items-center gap-2">
-                    <span className="text-base">{link.icon}</span>
-                    <span>{link.label}</span>
-                  </span>
-                  {isActive(link.to) && (
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 h-0.5 bg-primary rounded-full" />
-                  )}
+                  {link.label}
                 </Link>
               ))}
             </nav>
@@ -71,16 +65,15 @@ export function Layout() {
                 to="/profile"
                 className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-foreground/70 hover:text-primary hover:bg-primary/5 transition-all duration-300"
               >
-                <span className="text-lg">👤</span>
-                <span className="hidden md:inline">{user?.fullName || "Tài khoản"}</span>
+                <span>Tài khoản</span>
+                {user?.fullName && <span className="hidden md:inline">({user.fullName})</span>}
               </Link>
               
               <button
                 onClick={handleLogout}
-                className="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white bg-gradient-to-r from-primary to-accent hover:shadow-lg hover:shadow-primary/30 hover:scale-105 active:scale-95 transition-all duration-300"
+                className="sm:flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-black bg-gradient-to-r from-primary to-accent hover:shadow-md hover:shadow-primary/30 hover:scale-105 active:scale-95 transition-all duration-300"
               >
                 <span>Đăng xuất</span>
-                <span className="text-base">👋</span>
               </button>
 
               {/* Mobile menu button */}
@@ -123,33 +116,30 @@ export function Layout() {
                     key={link.to}
                     to={link.to}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-300 ${
+                    className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-300 ${
                       isActive(link.to)
-                        ? "text-primary bg-primary/10"
+                        ? "text-black bg-primary/10 shadow-md"
                         : "text-foreground/70 hover:text-primary hover:bg-primary/5"
                     }`}
                   >
-                    <span className="text-lg">{link.icon}</span>
-                    <span>{link.label}</span>
+                    {link.label}
                   </Link>
                 ))}
                 <Link
                   to="/profile"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="sm:hidden flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium text-foreground/70 hover:text-primary hover:bg-primary/5 transition-all"
+                  className="sm:hidden px-4 py-3 rounded-2xl text-sm font-medium text-foreground/70 hover:text-primary hover:bg-primary/5 transition-all"
                 >
-                  <span className="text-lg">👤</span>
-                  <span>{user?.fullName || "Tài khoản"}</span>
+                  Tài khoản {user?.fullName && `(${user.fullName})`}
                 </Link>
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     handleLogout();
                   }}
-                  className="sm:hidden flex items-center justify-center gap-2 px-4 py-3 rounded-2xl text-sm font-semibold text-white bg-gradient-to-r from-primary to-accent hover:shadow-lg transition-all"
+                  className="sm:hidden px-4 py-3 rounded-2xl text-sm font-semibold text-white bg-gradient-to-r from-primary to-accent hover:shadow-lg transition-all"
                 >
-                  <span>Đăng xuất</span>
-                  <span className="text-base">👋</span>
+                  Đăng xuất
                 </button>
               </nav>
             </div>

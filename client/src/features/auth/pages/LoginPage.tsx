@@ -104,11 +104,6 @@ export function LoginPage() {
         }} />
       </div>
 
-      {/* Floating leaf decorations */}
-      <div className="absolute top-20 left-10 text-6xl opacity-20 animate-float">🌿</div>
-      <div className="absolute bottom-20 right-10 text-5xl opacity-20 animate-float-delayed">🍃</div>
-      <div className="absolute top-1/2 right-20 text-4xl opacity-15 animate-float-slow">♻️</div>
-
       <div className="w-full max-w-md relative z-10 animate-scale-in">
         {/* Logo and brand */}
         <div className="text-center mb-8">
@@ -120,7 +115,7 @@ export function LoginPage() {
             />
           </div>
           <p className="text-base sm:text-lg text-foreground/70 font-medium">
-            Tủ đồ số & Chợ thời trang bền vững 🌱
+            Tủ đồ số & Chợ thời trang bền vững
           </p>
         </div>
 
@@ -350,52 +345,9 @@ export function LoginPage() {
 
         {/* Footer */}
         <div className="text-center mt-6 text-sm text-foreground/50">
-          <p>© 2026 MYTuDo. Thời trang bền vững 🌍</p>
+          <p>© 2026 MYTuDo. Thời trang bền vững</p>
         </div>
       </div>
-
-      <style>{`
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0px) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-20px) rotate(5deg);
-          }
-        }
-
-        @keyframes float-delayed {
-          0%, 100% {
-            transform: translateY(0px) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-15px) rotate(-5deg);
-          }
-        }
-
-        @keyframes float-slow {
-          0%, 100% {
-            transform: translateY(0px) scale(1);
-          }
-          50% {
-            transform: translateY(-10px) scale(1.1);
-          }
-        }
-
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-
-        .animate-float-delayed {
-          animation: float-delayed 7s ease-in-out infinite;
-          animation-delay: 1s;
-        }
-
-        .animate-float-slow {
-          animation: float-slow 8s ease-in-out infinite;
-          animation-delay: 2s;
-        }
-      `}</style>
     </div>
   );
 }

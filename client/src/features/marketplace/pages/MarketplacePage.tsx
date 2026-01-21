@@ -220,9 +220,10 @@ export function MarketplacePage() {
           flex-wrap: wrap;
           margin-bottom: 1.5rem;
           padding: 1.5rem;
-          background: linear-gradient(135deg, hsl(var(--primary) / 0.08), hsl(var(--accent) / 0.08));
-          border-radius: 12px;
-          border: 1px solid hsl(var(--primary) / 0.2);
+          background: white;
+          border-radius: 16px;
+          border: 1px solid hsl(var(--border));
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .filterGroup {
@@ -240,12 +241,18 @@ export function MarketplacePage() {
 
         .filterGroup select,
         .select {
-          padding: 0.625rem;
-          border: 2px solid hsl(var(--border));
-          border-radius: 8px;
+          padding: 0.625rem 0.875rem;
+          border: 1.5px solid hsl(var(--border));
+          border-radius: 12px;
           background: white;
           font-size: 0.875rem;
           transition: all 0.2s;
+          cursor: pointer;
+        }
+
+        .filterGroup select:hover,
+        .select:hover {
+          border-color: hsl(var(--primary) / 0.5);
         }
 
         .filterGroup select:focus,
@@ -277,11 +284,16 @@ export function MarketplacePage() {
 
         .priceInput {
           flex: 1;
-          padding: 0.625rem;
-          border: 2px solid hsl(var(--border));
-          border-radius: 8px;
+          padding: 0.625rem 0.875rem;
+          border: 1.5px solid hsl(var(--border));
+          border-radius: 12px;
           font-size: 0.875rem;
           transition: all 0.2s;
+          background: white;
+        }
+
+        .priceInput:hover {
+          border-color: hsl(var(--primary) / 0.5);
         }
 
         .priceInput:focus {
