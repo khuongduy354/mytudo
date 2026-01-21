@@ -9,6 +9,9 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        sync: false
 
   # Backend Server (Node.js) - Set to Free Plan
   - type: web
@@ -18,7 +21,7 @@ services:
     # Running from root to support workspaces
     rootDir: .
     # Use --include=dev to ensure @types are installed for compilation
-    buildCommand: npm install --include=dev && npm run build --workspace=@mytudo/shared && npm run build --workspace=@mytudo/server
+    buildCommand: npm install --include=dev && npm run build --workspace=@mytudo/server
     startCommand: npm start --workspace=@mytudo/server
     envVars:
       - key: NODE_ENV
