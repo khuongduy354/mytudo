@@ -1,21 +1,19 @@
 services:
-  # Frontend Client (Static Site)
-  - type: web
+  # Frontend Client (Static Site) - Always Free
+  - type: static
     name: mytudo-client
-    env: static
     buildCommand: npm install && npm run build --workspace=client
     staticPublishPath: client/dist
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
-    # Optional: basic plan to avoid free tier limits if desired, but default is sufficient
-    # plan: free
 
-  # Backend Server (Node.js)
+  # Backend Server (Node.js) - Set to Free Plan
   - type: web
     name: mytudo-server
     runtime: node
+    plan: free
     # Running from root to support workspaces
     rootDir: .
     buildCommand: npm install && npm run build --workspace=server
@@ -34,10 +32,12 @@ services:
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
 
-  # Background Removal Service (Python/FastAPI)
+  # Background Removal Service (Python/FastAPI) - Set to Free Plan
+  # IMPORTANT: Free tier has 512MB RAM limit. Torch/Transformers may exceed this.
   - type: web
     name: mytudo-bg-service
     runtime: python
+    plan: free
     rootDir: bg-remove-service
     buildCommand: pip install poetry && poetry install
     startCommand: poetry run uvicorn bg_remove_service.main:app --host 0.0.0.0 --port $PORT
