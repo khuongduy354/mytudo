@@ -73,12 +73,13 @@ export function MarketplacePage() {
         <h1>Chợ đồ</h1>
       </div>
 
-      <div className={styles.filters}>
-        <div className={styles.filterGroup}>
+      <div className="filters">
+        <div className="filterGroup">
           <label>Loại đồ</label>
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value as ItemCategory | "")}
+            className="select"
           >
             {CATEGORIES.map((cat) => (
               <option key={cat.value} value={cat.value}>
@@ -88,24 +89,59 @@ export function MarketplacePage() {
           </select>
         </div>
 
-        <div className={styles.filterGroup}>
-          <label>Giá từ</label>
-          <input
-            type="number"
-            placeholder="0"
-            value={minPrice}
-            onChange={(e) => setMinPrice(e.target.value)}
-          />
-        </div>
-
-        <div className={styles.filterGroup}>
-          <label>Đến</label>
-          <input
-            type="number"
-            placeholder="Không giới hạn"
-            value={maxPrice}
-            onChange={(e) => setMaxPrice(e.target.value)}
-          />
+        <div className="priceRangeGroup">
+          <label>Khoảng giá (VND)</label>
+          <div className="priceInputs">
+            <input
+              type="number"
+              placeholder="Từ"
+              value={minPrice}
+              onChange={(e) => {
+                const value = Math.max(0, Number(e.target.value) || 0);
+                setMinPrice(value.toString());
+              }}
+              min="0"
+              className="priceInput"
+            />
+            <span className="priceSeparator">-</span>
+            <input
+              type="number"
+              placeholder="Đến"
+              value={maxPrice}
+              onChange={(e) => {
+                const value = Math.max(0, Number(e.target.value) || 0);
+                setMaxPrice(value.toString());
+              }}
+              min="0"
+              className="priceInput"
+            />
+          </div>
+          <div className="sliderContainer">
+            <input
+              type="range"
+              min="0"
+              max="5000000"
+              step="50000"
+              value={minPrice || 0}
+              onChange={(e) => {
+                const value = Math.min(Number(e.target.value), Number(maxPrice) || 5000000);
+                setMinPrice(value.toString());
+              }}
+              className="rangeSlider rangeSliderMin"
+            />
+            <input
+              type="range"
+              min="0"
+              max="5000000"
+              step="50000"
+              value={maxPrice || 5000000}
+              onChange={(e) => {
+                const value = Math.max(Number(e.target.value), Number(minPrice) || 0);
+                setMaxPrice(value.toString());
+              }}
+              className="rangeSlider rangeSliderMax"
+            />
+          </div>
         </div>
       </div>
 
@@ -176,6 +212,176 @@ export function MarketplacePage() {
           ))}
         </div>
       )}
+
+      <style>{`
+        .filters {
+          display: flex;
+          gap: 1.5rem;
+          flex-wrap: wrap;
+          margin-bottom: 1.5rem;
+          padding: 1.5rem;
+          background: linear-gradient(135deg, hsl(var(--primary) / 0.08), hsl(var(--accent) / 0.08));
+          border-radius: 12px;
+          border: 1px solid hsl(var(--primary) / 0.2);
+        }
+
+        .filterGroup {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+          min-width: 150px;
+        }
+
+        .filterGroup label {
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: hsl(var(--foreground));
+        }
+
+        .filterGroup select,
+        .select {
+          padding: 0.625rem;
+          border: 2px solid hsl(var(--border));
+          border-radius: 8px;
+          background: white;
+          font-size: 0.875rem;
+          transition: all 0.2s;
+        }
+
+        .filterGroup select:focus,
+        .select:focus {
+          outline: none;
+          border-color: hsl(var(--primary));
+          box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
+        }
+
+        .priceRangeGroup {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+          flex: 1;
+          min-width: 280px;
+        }
+
+        .priceRangeGroup label {
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: hsl(var(--foreground));
+        }
+
+        .priceInputs {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+
+        .priceInput {
+          flex: 1;
+          padding: 0.625rem;
+          border: 2px solid hsl(var(--border));
+          border-radius: 8px;
+          font-size: 0.875rem;
+          transition: all 0.2s;
+        }
+
+        .priceInput:focus {
+          outline: none;
+          border-color: hsl(var(--primary));
+          box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
+        }
+
+        .priceSeparator {
+          color: hsl(var(--muted-foreground));
+          font-weight: 600;
+        }
+
+        .sliderContainer {
+          position: relative;
+          height: 40px;
+          display: flex;
+          align-items: center;
+        }
+
+        .rangeSlider {
+          position: absolute;
+          width: 100%;
+          height: 6px;
+          -webkit-appearance: none;
+          appearance: none;
+          background: transparent;
+          pointer-events: none;
+        }
+
+        .rangeSlider::-webkit-slider-track {
+          width: 100%;
+          height: 6px;
+          background: hsl(var(--muted));
+          border-radius: 3px;
+        }
+
+        .rangeSlider::-moz-range-track {
+          width: 100%;
+          height: 6px;
+          background: hsl(var(--muted));
+          border-radius: 3px;
+        }
+
+        .rangeSlider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 20px;
+          height: 20px;
+          background: hsl(var(--primary));
+          border: 3px solid white;
+          border-radius: 50%;
+          cursor: pointer;
+          pointer-events: all;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+          transition: all 0.2s;
+        }
+
+        .rangeSlider::-moz-range-thumb {
+          width: 20px;
+          height: 20px;
+          background: hsl(var(--primary));
+          border: 3px solid white;
+          border-radius: 50%;
+          cursor: pointer;
+          pointer-events: all;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+          transition: all 0.2s;
+        }
+
+        .rangeSlider::-webkit-slider-thumb:hover {
+          transform: scale(1.2);
+          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .rangeSlider::-moz-range-thumb:hover {
+          transform: scale(1.2);
+          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .rangeSliderMax::-webkit-slider-thumb {
+          background: hsl(var(--accent));
+        }
+
+        .rangeSliderMax::-moz-range-thumb {
+          background: hsl(var(--accent));
+        }
+
+        @media (max-width: 768px) {
+          .filters {
+            flex-direction: column;
+            gap: 1rem;
+          }
+
+          .filterGroup,
+          .priceRangeGroup {
+            min-width: 100%;
+          }
+        }
+      `}</style>
     </div>
   );
 }

@@ -38,8 +38,8 @@ export class DevSupabaseClient implements ISupabaseClient {
   private client: SupabaseClientType;
 
   constructor() {
-    const supabaseUrl = process.env.DEV_SUPABASE_URL;
-    const supabaseKey = process.env.DEV_SUPABASE_SERVICE_ROLE_KEY;
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
       throw new Error("Missing DEV Supabase environment variables");

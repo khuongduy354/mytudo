@@ -3,8 +3,10 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 // Load environment variables
+const isDevEnv = process.env.NODE_ENV === "development";
+console.log("[DEBUG] Is dev env", isDevEnv);
 dotenv.config({
-  path: process.env.NODE_ENV === "development" ? ".env.local" : ".env",
+  path: isDevEnv ? ".env.dev" : ".env",
 });
 
 // Import DI setup

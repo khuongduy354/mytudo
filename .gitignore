@@ -8,3 +8,5 @@ duydevlog
 
 *.pyc
 .venv
+
+.agent

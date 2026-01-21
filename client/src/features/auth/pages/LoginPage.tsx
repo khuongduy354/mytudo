@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../../../components/Button";
 import { Input } from "../../../components/Input";
 import { useAuth } from "../hooks/useAuth";
+import logoImage from "../../../../mytudo-logo-removebg-preview.png";
 
 type AuthMode = "login" | "register" | "magic-link";
 
@@ -93,34 +94,40 @@ export function LoginPage() {
     isSendMagicLinkPending;
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-linear-to-br from-primary/10 via-background to-accent/10 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute top-1/2 -right-24 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute -bottom-24 left-1/3 w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-pulse delay-2000" />
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 relative overflow-hidden bg-gradient-to-br from-[#F5F9F8] via-[#E8F5F3] to-[#D4EDE8]">
+      {/* Organic background patterns */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
+        <div className="absolute top-0 left-0 w-full h-full" style={{
+          backgroundImage: `radial-gradient(circle at 20% 30%, rgba(77, 208, 200, 0.15) 0%, transparent 50%),
+                           radial-gradient(circle at 80% 70%, rgba(77, 208, 200, 0.1) 0%, transparent 50%),
+                           radial-gradient(circle at 40% 80%, rgba(95, 227, 219, 0.12) 0%, transparent 50%)`
+        }} />
       </div>
 
-      <div className="w-full max-w-md relative z-10 animate-fade-in">
+      {/* Floating leaf decorations */}
+      <div className="absolute top-20 left-10 text-6xl opacity-20 animate-float">🌿</div>
+      <div className="absolute bottom-20 right-10 text-5xl opacity-20 animate-float-delayed">🍃</div>
+      <div className="absolute top-1/2 right-20 text-4xl opacity-15 animate-float-slow">♻️</div>
+
+      <div className="w-full max-w-md relative z-10 animate-scale-in">
         {/* Logo and brand */}
-        <div className="text-center mb-8 animate-slide-down">
-          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-primary rounded-2xl mb-4 shadow-lg shadow-primary/50 hover:scale-110 transition-transform duration-300">
-            <span className="text-2xl sm:text-3xl font-bold text-primary-foreground">
-              MT
-            </span>
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center mb-6 hover:scale-105 transition-transform duration-500">
+            <img 
+              src={logoImage} 
+              alt="MYTuDo" 
+              className="h-24 sm:h-28 w-auto drop-shadow-xl" 
+            />
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2 bg-clip-text text-transparent bg-linear-to-r from-primary to-accent">
-            MYTuDo
-          </h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Tủ đồ số & Chợ thời trang bền vững
+          <p className="text-base sm:text-lg text-foreground/70 font-medium">
+            Tủ đồ số & Chợ thời trang bền vững 🌱
           </p>
         </div>
 
         {/* Main card */}
-        <div className="bg-card/80 backdrop-blur-xl border border-border shadow-2xl rounded-2xl p-6 sm:p-8 transition-all duration-300 hover:shadow-primary/20 animate-scale-in">
+        <div className="bg-white/95 backdrop-blur-sm shadow-xl rounded-3xl p-6 sm:p-8 transition-all duration-300 hover:shadow-2xl border border-primary/10">
           {isDev && mode === "login" && (
-            <div className="mb-6 p-4 bg-primary/10 border border-primary/20 rounded-xl animate-fade-in">
+            <div className="mb-6 p-4 bg-primary/5 border border-primary/10 rounded-2xl">
               <label className="block text-sm font-semibold text-primary mb-2">
                 Test Users (Dev Only):
               </label>
@@ -130,7 +137,7 @@ export function LoginPage() {
                   if (user) handleTestUserSelect(user);
                 }}
                 defaultValue=""
-                className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                className="w-full px-3 py-2.5 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
               >
                 <option value="" disabled>
                   Select test user...
@@ -146,7 +153,7 @@ export function LoginPage() {
 
           {mode === "login" && (
             <div className="animate-fade-in">
-              <h2 className="text-2xl font-bold text-foreground mb-6">
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6">
                 Đăng nhập
               </h2>
               <form onSubmit={handleLogin} className="space-y-4">
@@ -156,7 +163,7 @@ export function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="transition-all hover:border-primary/50"
+                  className="transition-all hover:border-primary/50 focus:border-primary"
                 />
                 <Input
                   type="password"
@@ -164,11 +171,11 @@ export function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="transition-all hover:border-primary/50"
+                  className="transition-all hover:border-primary/50 focus:border-primary"
                 />
 
                 {error && (
-                  <div className="bg-destructive/10 border border-destructive/30 text-destructive px-4 py-3 rounded-lg text-sm animate-shake">
+                  <div className="bg-destructive/10 border border-destructive/30 text-destructive px-4 py-3 rounded-2xl text-sm">
                     {error}
                   </div>
                 )}
@@ -176,7 +183,7 @@ export function LoginPage() {
                 <Button
                   type="submit"
                   isLoading={isPending}
-                  className="w-full hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 hover:scale-[1.02]"
+                  className="w-full hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                 >
                   Đăng nhập
                 </Button>
@@ -203,7 +210,7 @@ export function LoginPage() {
 
           {mode === "register" && (
             <div className="animate-fade-in">
-              <h2 className="text-2xl font-bold text-foreground mb-6">
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6">
                 Đăng ký
               </h2>
               <form onSubmit={handleRegister} className="space-y-4">
@@ -213,7 +220,7 @@ export function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="transition-all hover:border-primary/50"
+                  className="transition-all hover:border-primary/50 focus:border-primary"
                 />
                 <Input
                   type="password"
@@ -221,18 +228,18 @@ export function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="transition-all hover:border-primary/50"
+                  className="transition-all hover:border-primary/50 focus:border-primary"
                 />
                 <Input
                   type="text"
                   placeholder="Họ và tên (tùy chọn)"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="transition-all hover:border-primary/50"
+                  className="transition-all hover:border-primary/50 focus:border-primary"
                 />
 
                 {error && (
-                  <div className="bg-destructive/10 border border-destructive/30 text-destructive px-4 py-3 rounded-lg text-sm animate-shake">
+                  <div className="bg-destructive/10 border border-destructive/30 text-destructive px-4 py-3 rounded-2xl text-sm">
                     {error}
                   </div>
                 )}
@@ -240,7 +247,7 @@ export function LoginPage() {
                 <Button
                   type="submit"
                   isLoading={isPending}
-                  className="w-full hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 hover:scale-[1.02]"
+                  className="w-full hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                 >
                   Đăng ký
                 </Button>
@@ -260,12 +267,12 @@ export function LoginPage() {
 
           {mode === "magic-link" && (
             <div className="animate-fade-in">
-              <h2 className="text-2xl font-bold text-foreground mb-6">
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6">
                 Magic Link
               </h2>
               {magicLinkSent ? (
                 <div className="text-center space-y-4 py-4">
-                  <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                  <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
                     <svg
                       className="w-8 h-8 text-primary"
                       fill="none"
@@ -309,11 +316,11 @@ export function LoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="transition-all hover:border-primary/50"
+                    className="transition-all hover:border-primary/50 focus:border-primary"
                   />
 
                   {error && (
-                    <div className="bg-destructive/10 border border-destructive/30 text-destructive px-4 py-3 rounded-lg text-sm animate-shake">
+                    <div className="bg-destructive/10 border border-destructive/30 text-destructive px-4 py-3 rounded-2xl text-sm">
                       {error}
                     </div>
                   )}
@@ -321,7 +328,7 @@ export function LoginPage() {
                   <Button
                     type="submit"
                     isLoading={isPending}
-                    className="w-full hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 hover:scale-[1.02]"
+                    className="w-full hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                   >
                     Gửi Magic Link
                   </Button>
@@ -342,80 +349,50 @@ export function LoginPage() {
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-6 text-sm text-muted-foreground animate-fade-in delay-300">
-          <p>© 2026 MYTuDo. Thời trang bền vững</p>
+        <div className="text-center mt-6 text-sm text-foreground/50">
+          <p>© 2026 MYTuDo. Thời trang bền vững 🌍</p>
         </div>
       </div>
 
       <style>{`
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-
-        @keyframes slide-down {
-          from {
-            opacity: 0;
-            transform: translateY(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes scale-in {
-          from {
-            opacity: 0;
-            transform: scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-
-        @keyframes shake {
+        @keyframes float {
           0%, 100% {
-            transform: translateX(0);
+            transform: translateY(0px) rotate(0deg);
           }
-          10%, 30%, 50%, 70%, 90% {
-            transform: translateX(-4px);
-          }
-          20%, 40%, 60%, 80% {
-            transform: translateX(4px);
+          50% {
+            transform: translateY(-20px) rotate(5deg);
           }
         }
 
-        .animate-fade-in {
-          animation: fade-in 0.5s ease-out;
+        @keyframes float-delayed {
+          0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-15px) rotate(-5deg);
+          }
         }
 
-        .animate-slide-down {
-          animation: slide-down 0.6s ease-out;
+        @keyframes float-slow {
+          0%, 100% {
+            transform: translateY(0px) scale(1);
+          }
+          50% {
+            transform: translateY(-10px) scale(1.1);
+          }
         }
 
-        .animate-scale-in {
-          animation: scale-in 0.4s ease-out;
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
         }
 
-        .animate-shake {
-          animation: shake 0.5s ease-in-out;
-        }
-
-        .delay-300 {
-          animation-delay: 300ms;
-        }
-
-        .delay-1000 {
+        .animate-float-delayed {
+          animation: float-delayed 7s ease-in-out infinite;
           animation-delay: 1s;
         }
 
-        .delay-2000 {
+        .animate-float-slow {
+          animation: float-slow 8s ease-in-out infinite;
           animation-delay: 2s;
         }
       `}</style>
