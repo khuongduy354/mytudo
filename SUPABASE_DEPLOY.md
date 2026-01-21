@@ -68,7 +68,7 @@ Once your Supabase project is deployed, you will need to get the API keys to use
 
 *   `SUPABASE_URL`
 *   `SUPABASE_ANON_KEY`
-*   `SUPABASE_SERVICE_KEY`
+*   `SUPABASE_SERVICE_ROLE_KEY`
 
 ## Troubleshooting
 
