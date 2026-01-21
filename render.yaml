@@ -1,7 +1,8 @@
 services:
   # Frontend Client (Static Site) - Always Free
-  - type: static
+  - type: web
     name: mytudo-client
+    runtime: static
     buildCommand: npm install && npm run build --workspace=client
     staticPublishPath: client/dist
     routes:
