@@ -18,7 +18,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@shared/*": ["../shared/src/*"]
+      "@shared/*": ["../shared/src/*"],
+      "@mytudo/shared": ["../shared/src"]
     }
   },
   "include": ["src"],
