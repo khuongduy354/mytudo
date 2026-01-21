@@ -5,8 +5,8 @@ import type {
   CreateOrderRequest,
   UpdateOrderRequest,
   OrderStatus,
-} from "@mytudo/shared";
-import type { PaginationMeta } from "@mytudo/shared";
+} from "../shared";
+import type { PaginationMeta } from "../shared";
 
 interface DbOrder {
   id: string;
@@ -60,7 +60,7 @@ export class OrderModel {
         ),
         buyer:buyer_id (id, full_name, avatar_url),
         seller:seller_id (id, full_name, avatar_url)
-      `
+      `,
       )
       .eq("id", id)
       .single();
@@ -116,7 +116,7 @@ export class OrderModel {
   async findByBuyer(
     buyerId: string,
     page: number = 1,
-    limit: number = 20
+    limit: number = 20,
   ): Promise<{ items: Order[]; meta: PaginationMeta }> {
     const offset = (page - 1) * limit;
 
@@ -144,7 +144,7 @@ export class OrderModel {
   async findBySeller(
     sellerId: string,
     page: number = 1,
-    limit: number = 20
+    limit: number = 20,
   ): Promise<{ items: Order[]; meta: PaginationMeta }> {
     const offset = (page - 1) * limit;
 
@@ -184,7 +184,7 @@ export class OrderModel {
   async create(
     buyerId: string,
     sellerId: string,
-    data: CreateOrderRequest
+    data: CreateOrderRequest,
   ): Promise<Order> {
     const dbData = {
       listing_id: data.listingId,

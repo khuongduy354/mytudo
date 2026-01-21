@@ -1,5 +1,5 @@
 import type { ISupabaseClient } from "../di/supabase.js";
-import type { UserProfile, UpdateProfileRequest } from "@mytudo/shared";
+import type { UserProfile, UpdateProfileRequest } from "../shared";
 
 interface DbUser {
   id: string;
@@ -65,7 +65,7 @@ export class UserModel {
   async create(
     id: string,
     identifier: { email?: string; phone?: string },
-    fullName?: string
+    fullName?: string,
   ): Promise<UserProfile> {
     const { data, error } = await this.supabase
       .getClient()
@@ -85,7 +85,7 @@ export class UserModel {
 
   async update(
     id: string,
-    updates: UpdateProfileRequest
+    updates: UpdateProfileRequest,
   ): Promise<UserProfile> {
     const dbUpdates: Partial<DbUser> = {};
     if (updates.fullName !== undefined) dbUpdates.full_name = updates.fullName;

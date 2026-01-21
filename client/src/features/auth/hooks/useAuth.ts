@@ -12,7 +12,7 @@ import type {
   RegisterWithEmailRequest,
   SendMagicLinkRequest,
   UpdateProfileRequest,
-} from "@mytudo/shared";
+} from "@/shared";
 
 /**
  * Custom hook for authentication operations

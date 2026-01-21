@@ -8,11 +8,11 @@ import type {
   Wardrobe,
   CreateWardrobeRequest,
   UpdateWardrobeRequest,
-} from "@mytudo/shared";
+} from "@/shared";
 
 export const wardrobeApi = {
   getItems: async (
-    filters?: WardrobeFilters
+    filters?: WardrobeFilters,
   ): Promise<{
     data: WardrobeItem[];
     meta: PaginatedResponse<WardrobeItem>["meta"];
@@ -33,7 +33,7 @@ export const wardrobeApi = {
   },
 
   createItem: async (
-    data: CreateWardrobeItemRequest
+    data: CreateWardrobeItemRequest,
   ): Promise<WardrobeItem> => {
     const response = await apiClient.post("/wardrobe", data);
     return response.data.data;
@@ -41,7 +41,7 @@ export const wardrobeApi = {
 
   updateItem: async (
     id: string,
-    data: UpdateWardrobeItemRequest
+    data: UpdateWardrobeItemRequest,
   ): Promise<WardrobeItem> => {
     const response = await apiClient.put(`/wardrobe/${id}`, data);
     return response.data.data;
@@ -74,7 +74,7 @@ export const wardrobeApi = {
 
   updateWardrobe: async (
     id: string,
-    data: UpdateWardrobeRequest
+    data: UpdateWardrobeRequest,
   ): Promise<Wardrobe> => {
     const response = await apiClient.put(`/wardrobe/wardrobes/${id}`, data);
     return response.data.data;

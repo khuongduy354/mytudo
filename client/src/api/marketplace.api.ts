@@ -3,11 +3,11 @@ import type {
   ListingWithDetails,
   MarketplaceFilters,
   PaginatedResponse,
-} from "@mytudo/shared";
+} from "@/shared";
 
 export const marketplaceApi = {
   getListings: async (
-    filters?: MarketplaceFilters
+    filters?: MarketplaceFilters,
   ): Promise<{
     data: ListingWithDetails[];
     meta: PaginatedResponse<ListingWithDetails>["meta"];

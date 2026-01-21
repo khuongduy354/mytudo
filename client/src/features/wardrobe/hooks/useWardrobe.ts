@@ -6,7 +6,7 @@ import type {
   UpdateWardrobeItemRequest,
   CreateWardrobeRequest,
   UpdateWardrobeRequest,
-} from "@mytudo/shared";
+} from "@/shared";
 
 export function useWardrobe(filters?: WardrobeFilters) {
   return useQuery({

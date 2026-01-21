@@ -1,9 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { listingsApi } from "../../../api";
-import type {
-  CreateListingRequest,
-  UpdateListingRequest,
-} from "@mytudo/shared";
+import type { CreateListingRequest, UpdateListingRequest } from "@/shared";
 
 export function useMyListings() {
   return useQuery({

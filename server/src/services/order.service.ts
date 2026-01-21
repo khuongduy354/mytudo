@@ -6,13 +6,13 @@ import type {
   OrderWithDetails,
   CreateOrderRequest,
   PaginationMeta,
-} from "@mytudo/shared";
+} from "../shared";
 
 export class OrderService {
   constructor(
     private orderModel: OrderModel,
     private listingModel: ListingModel,
-    private wardrobeModel: WardrobeModel
+    private wardrobeModel: WardrobeModel,
   ) {}
 
   async createOrder(buyerId: string, data: CreateOrderRequest): Promise<Order> {
@@ -33,7 +33,7 @@ export class OrderService {
     // Check if buyer already has pending order for this listing
     const existingOrders = await this.orderModel.findByListing(data.listingId);
     const hasPendingOrder = existingOrders.some(
-      (o) => o.buyerId === buyerId && o.status === "pending"
+      (o) => o.buyerId === buyerId && o.status === "pending",
     );
     if (hasPendingOrder) {
       throw new Error("You already have a pending order for this listing");
@@ -46,7 +46,7 @@ export class OrderService {
     userId: string,
     type: "buying" | "selling",
     page: number = 1,
-    limit: number = 20
+    limit: number = 20,
   ): Promise<{ items: Order[]; meta: PaginationMeta }> {
     if (type === "buying") {
       return this.orderModel.findByBuyer(userId, page, limit);
@@ -56,7 +56,7 @@ export class OrderService {
 
   async getOrderDetails(
     orderId: string,
-    userId: string
+    userId: string,
   ): Promise<OrderWithDetails | null> {
     const order = await this.orderModel.findByIdWithDetails(orderId);
     if (!order) return null;
@@ -125,7 +125,7 @@ export class OrderService {
 
     // Get buyer's default wardrobe
     const buyerWardrobe = await this.wardrobeModel.getDefaultWardrobe(
-      order.buyerId
+      order.buyerId,
     );
     if (!buyerWardrobe) {
       throw new Error("Buyer has no default wardrobe");
@@ -135,7 +135,7 @@ export class OrderService {
     await this.wardrobeModel.transferOwnership(
       listing.wardrobeItemId,
       order.buyerId,
-      buyerWardrobe.id
+      buyerWardrobe.id,
     );
 
     // Mark listing as sold

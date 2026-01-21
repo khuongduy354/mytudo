@@ -1,4 +1,4 @@
-import type { PaginationParams } from "@mytudo/shared";
+import type { PaginationParams } from "../shared";
 
 export const getPaginationParams = (query: any): PaginationParams => {
   return {

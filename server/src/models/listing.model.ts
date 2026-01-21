@@ -7,8 +7,8 @@ import type {
   MarketplaceFilters,
   ListingCondition,
   ListingStatus,
-} from "@mytudo/shared";
-import type { PaginationMeta } from "@mytudo/shared";
+} from "../shared";
+import type { PaginationMeta } from "../shared";
 
 interface DbListing {
   id: string;
@@ -53,7 +53,7 @@ export class ListingModel {
 
   async findByIdWithDetails(
     id: string,
-    currentUserId?: string
+    currentUserId?: string,
   ): Promise<ListingWithDetails | null> {
     const { data, error } = await this.supabase
       .getClient()
@@ -63,7 +63,7 @@ export class ListingModel {
         *,
         wardrobe_items (*),
         users:seller_id!inner (id, full_name, avatar_url)
-      `
+      `,
       )
       .eq("id", id)
       .single();
@@ -112,7 +112,7 @@ export class ListingModel {
   async findBySeller(
     sellerId: string,
     page: number = 1,
-    limit: number = 20
+    limit: number = 20,
   ): Promise<{ items: Listing[]; meta: PaginationMeta }> {
     const offset = (page - 1) * limit;
 
@@ -124,7 +124,7 @@ export class ListingModel {
         *,
         wardrobe_items (*)
       `,
-        { count: "exact" }
+        { count: "exact" },
       )
       .eq("seller_id", sellerId)
       .order("created_at", { ascending: false })
@@ -178,7 +178,7 @@ export class ListingModel {
 
   async marketplace(
     filters: MarketplaceFilters,
-    currentUserId?: string
+    currentUserId?: string,
   ): Promise<{ items: ListingWithDetails[]; meta: PaginationMeta }> {
     const {
       category,
@@ -197,7 +197,7 @@ export class ListingModel {
     const { data: sessionData } = await client.auth.getSession();
     console.log(
       "DEBUG marketplace - Supabase session:",
-      sessionData.session ? "EXISTS" : "NULL"
+      sessionData.session ? "EXISTS" : "NULL",
     );
     if (sessionData.session) {
       console.log("DEBUG - Session user:", sessionData.session.user.id);
@@ -217,7 +217,7 @@ export class ListingModel {
         ),
         users:seller_id!inner (id, full_name, avatar_url)
       `,
-        { count: "exact" }
+        { count: "exact" },
       )
       .eq("status", "active");
 
@@ -239,7 +239,7 @@ export class ListingModel {
 
     if (search) {
       query = query.or(
-        `wardrobe_items.name.ilike.%${search}%,wardrobe_items.brand.ilike.%${search}%`
+        `wardrobe_items.name.ilike.%${search}%,wardrobe_items.brand.ilike.%${search}%`,
       );
     }
 
@@ -265,7 +265,7 @@ export class ListingModel {
     console.log(
       "DEBUG marketplace - Raw query returned:",
       data?.length || 0,
-      "items"
+      "items",
     );
     if (data && data.length > 0) {
       console.log(
@@ -278,8 +278,8 @@ export class ListingModel {
             users: data[0].users,
           },
           null,
-          2
-        )
+          2,
+        ),
       );
     }
 
@@ -368,7 +368,7 @@ export class ListingModel {
   async update(
     id: string,
     sellerId: string,
-    data: UpdateListingRequest
+    data: UpdateListingRequest,
   ): Promise<Listing> {
     const dbData: Partial<DbListing> = {};
     if (data.price !== undefined) dbData.price = data.price;

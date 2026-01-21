@@ -1,6 +1,6 @@
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useWardrobeItem, useDeleteWardrobeItem } from "../hooks/useWardrobe";
-import { CATEGORY_LABELS } from "@mytudo/shared";
+import { CATEGORY_LABELS } from "@/shared";
 import styles from "./WardrobeItemDetailPage.module.css";
 
 const COLOR_MAP: Record<string, string> = {

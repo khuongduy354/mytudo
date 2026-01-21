@@ -3,12 +3,12 @@ import type {
   WishlistItem,
   ListingWithDetails,
   PaginatedResponse,
-} from "@mytudo/shared";
+} from "@/shared";
 
 export const wishlistApi = {
   getWishlist: async (
     page: number = 1,
-    limit: number = 20
+    limit: number = 20,
   ): Promise<{
     data: ListingWithDetails[];
     meta: PaginatedResponse<ListingWithDetails>["meta"];

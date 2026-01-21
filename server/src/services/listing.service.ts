@@ -7,17 +7,17 @@ import type {
   UpdateListingRequest,
   MarketplaceFilters,
   PaginationMeta,
-} from "@mytudo/shared";
+} from "../shared";
 
 export class ListingService {
   constructor(
     private listingModel: ListingModel,
-    private wardrobeModel: WardrobeModel
+    private wardrobeModel: WardrobeModel,
   ) {}
 
   async createListing(
     sellerId: string,
-    data: CreateListingRequest
+    data: CreateListingRequest,
   ): Promise<Listing> {
     // Verify the wardrobe item belongs to the seller
     const item = await this.wardrobeModel.findById(data.wardrobeItemId);
@@ -29,13 +29,13 @@ export class ListingService {
     const wardrobe = await this.wardrobeModel.findWardrobeById(item.wardrobeId);
     if (!wardrobe || wardrobe.visibility !== "public") {
       throw new Error(
-        "Cannot list items from private wardrobes. Please move the item to a public wardrobe first."
+        "Cannot list items from private wardrobes. Please move the item to a public wardrobe first.",
       );
     }
 
     // Check if item already has a listing
     const existingListing = await this.listingModel.findByWardrobeItemId(
-      data.wardrobeItemId
+      data.wardrobeItemId,
     );
     if (existingListing) {
       throw new Error("This item already has a listing");
@@ -47,7 +47,7 @@ export class ListingService {
   async getMyListings(
     sellerId: string,
     page: number = 1,
-    limit: number = 20
+    limit: number = 20,
   ): Promise<{ items: Listing[]; meta: PaginationMeta }> {
     return this.listingModel.findBySeller(sellerId, page, limit);
   }
@@ -55,7 +55,7 @@ export class ListingService {
   async updateListing(
     id: string,
     sellerId: string,
-    data: UpdateListingRequest
+    data: UpdateListingRequest,
   ): Promise<Listing> {
     // Verify ownership
     const existing = await this.listingModel.findById(id);
@@ -79,14 +79,14 @@ export class ListingService {
 
   async getMarketplace(
     filters: MarketplaceFilters,
-    currentUserId?: string
+    currentUserId?: string,
   ): Promise<{ items: ListingWithDetails[]; meta: PaginationMeta }> {
     return this.listingModel.marketplace(filters, currentUserId);
   }
 
   async getListingDetails(
     id: string,
-    currentUserId?: string
+    currentUserId?: string,
   ): Promise<ListingWithDetails | null> {
     return this.listingModel.findByIdWithDetails(id, currentUserId);
   }

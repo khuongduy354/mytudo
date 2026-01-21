@@ -4,23 +4,23 @@ import type {
   WishlistItem,
   ListingWithDetails,
   PaginationMeta,
-} from "@mytudo/shared";
+} from "../shared";
 
 export class WishlistService {
   constructor(
     private wishlistModel: WishlistModel,
-    private listingModel: ListingModel
+    private listingModel: ListingModel,
   ) {}
 
   async getWishlist(
     userId: string,
     page: number = 1,
-    limit: number = 20
+    limit: number = 20,
   ): Promise<{ items: ListingWithDetails[]; meta: PaginationMeta }> {
     const wishlistResult = await this.wishlistModel.findByUser(
       userId,
       page,
-      limit
+      limit,
     );
 
     // Get listing details for each wishlist item
@@ -28,7 +28,7 @@ export class WishlistService {
     for (const wishlistItem of wishlistResult.items) {
       const listing = await this.listingModel.findByIdWithDetails(
         wishlistItem.listingId,
-        userId
+        userId,
       );
       if (listing) {
         items.push(listing);
@@ -43,7 +43,7 @@ export class WishlistService {
 
   async addToWishlist(
     userId: string,
-    listingId: string
+    listingId: string,
   ): Promise<WishlistItem> {
     // Verify listing exists and is active
     const listing = await this.listingModel.findById(listingId);

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useMyListings, useUpdateListing } from "../hooks/useListings";
-import { CATEGORY_LABELS, type ListingStatus } from "@mytudo/shared";
+import { CATEGORY_LABELS, type ListingStatus } from "@/shared";
 import styles from "./MyListingsPage.module.css";
 
 const STATUS_TABS: { value: ListingStatus | "all"; label: string }[] = [
@@ -40,7 +40,7 @@ function formatDate(dateStr: string): string {
 
 export function MyListingsPage() {
   const [statusFilter, setStatusFilter] = useState<ListingStatus | "all">(
-    "all"
+    "all",
   );
 
   const { data, isLoading, error } = useMyListings();
@@ -134,8 +134,8 @@ export function MyListingsPage() {
                   {listing.status === "active"
                     ? "Đang bán"
                     : listing.status === "sold"
-                    ? "Đã bán"
-                    : "Đã hủy"}
+                      ? "Đã bán"
+                      : "Đã hủy"}
                 </span>
               </div>
               <div className={styles.cardContent}>

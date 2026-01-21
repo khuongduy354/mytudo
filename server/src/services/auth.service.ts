@@ -8,13 +8,13 @@ import type {
   RegisterWithEmailRequest,
   SendMagicLinkRequest,
   SendMagicLinkResponse,
-} from "@mytudo/shared";
+} from "../shared";
 import { createClient } from "@supabase/supabase-js";
 
 export class AuthService {
   constructor(
     private userModel: UserModel,
-    private supabase: ISupabaseClient
+    private supabase: ISupabaseClient,
   ) {}
 
   // Create a temporary client for auth operations to avoid polluting the singleton
@@ -56,7 +56,7 @@ export class AuthService {
       user = await this.userModel.create(
         authData.user.id,
         { email: data.email },
-        authData.user.user_metadata?.full_name
+        authData.user.user_metadata?.full_name,
       );
     }
 
@@ -68,7 +68,7 @@ export class AuthService {
   }
 
   async registerWithEmail(
-    data: RegisterWithEmailRequest
+    data: RegisterWithEmailRequest,
   ): Promise<AuthResponse> {
     // Use a separate client instance
     const authClient = this.createAuthClient();
@@ -85,7 +85,7 @@ export class AuthService {
 
     if (error || !authData.user) {
       throw new Error(
-        `Registration failed: ${error?.message || "Unknown error"}`
+        `Registration failed: ${error?.message || "Unknown error"}`,
       );
     }
 
@@ -93,7 +93,7 @@ export class AuthService {
     const user = await this.userModel.create(
       authData.user.id,
       { email: data.email },
-      data.fullName
+      data.fullName,
     );
 
     return {
@@ -105,7 +105,7 @@ export class AuthService {
 
   // Magic link authentication (passwordless email login)
   async sendMagicLink(
-    data: SendMagicLinkRequest
+    data: SendMagicLinkRequest,
   ): Promise<SendMagicLinkResponse> {
     const authClient = this.createAuthClient();
 
@@ -129,13 +129,13 @@ export class AuthService {
 
   async updateProfile(
     userId: string,
-    data: UpdateProfileRequest
+    data: UpdateProfileRequest,
   ): Promise<UserProfile> {
     return this.userModel.update(userId, data);
   }
 
   async refreshToken(
-    refreshToken: string
+    refreshToken: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
     // Use a separate client instance for refresh
     const authClient = this.createAuthClient();
@@ -146,7 +146,7 @@ export class AuthService {
 
     if (error || !data.session) {
       throw new Error(
-        `Failed to refresh token: ${error?.message || "Unknown error"}`
+        `Failed to refresh token: ${error?.message || "Unknown error"}`,
       );
     }
 

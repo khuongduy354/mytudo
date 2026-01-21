@@ -5,7 +5,7 @@ import {
   useCreateWardrobe,
   useDeleteWardrobe,
 } from "../hooks/useWardrobe";
-import type { WardrobeVisibility } from "@mytudo/shared";
+import type { WardrobeVisibility } from "@/shared";
 import styles from "./WardrobesPage.module.css";
 
 export function WardrobesPage() {

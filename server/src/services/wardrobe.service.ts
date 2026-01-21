@@ -9,17 +9,17 @@ import type {
   Wardrobe,
   CreateWardrobeRequest,
   UpdateWardrobeRequest,
-} from "@mytudo/shared";
+} from "../shared";
 
 export class WardrobeService {
   constructor(
     private wardrobeModel: WardrobeModel,
-    private listingModel: ListingModel
+    private listingModel: ListingModel,
   ) {}
 
   async getItems(
     userId: string,
-    filters: WardrobeFilters
+    filters: WardrobeFilters,
   ): Promise<{ items: WardrobeItem[]; meta: PaginationMeta }> {
     const result = await this.wardrobeModel.findByUser(userId, filters);
 
@@ -31,7 +31,7 @@ export class WardrobeService {
           ...item,
           hasListing: listing !== null && listing.status === "active",
         };
-      })
+      }),
     );
 
     return {
@@ -53,14 +53,13 @@ export class WardrobeService {
 
   async createItem(
     userId: string,
-    data: CreateWardrobeItemRequest
+    data: CreateWardrobeItemRequest,
   ): Promise<WardrobeItem> {
     // If no wardrobe specified, use default wardrobe
     let wardrobeId = data.wardrobeId;
     if (!wardrobeId) {
-      const defaultWardrobe = await this.wardrobeModel.getDefaultWardrobe(
-        userId
-      );
+      const defaultWardrobe =
+        await this.wardrobeModel.getDefaultWardrobe(userId);
       if (!defaultWardrobe) {
         throw new Error("No default wardrobe found");
       }
@@ -73,7 +72,7 @@ export class WardrobeService {
   async updateItem(
     id: string,
     userId: string,
-    data: UpdateWardrobeItemRequest
+    data: UpdateWardrobeItemRequest,
   ): Promise<WardrobeItem> {
     // Verify ownership
     const existing = await this.wardrobeModel.findById(id);
@@ -95,7 +94,7 @@ export class WardrobeService {
     const listing = await this.listingModel.findByWardrobeItemId(id);
     if (listing && listing.status === "active") {
       throw new Error(
-        "Cannot delete item with active listing. Remove the listing first."
+        "Cannot delete item with active listing. Remove the listing first.",
       );
     }
 
@@ -122,7 +121,7 @@ export class WardrobeService {
 
   async createWardrobe(
     userId: string,
-    data: CreateWardrobeRequest
+    data: CreateWardrobeRequest,
   ): Promise<Wardrobe> {
     return this.wardrobeModel.createWardrobe(userId, data);
   }
@@ -130,7 +129,7 @@ export class WardrobeService {
   async updateWardrobe(
     id: string,
     userId: string,
-    data: UpdateWardrobeRequest
+    data: UpdateWardrobeRequest,
   ): Promise<Wardrobe> {
     const existing = await this.wardrobeModel.findWardrobeById(id);
     if (!existing || existing.userId !== userId) {
