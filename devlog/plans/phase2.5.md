@@ -1,7 +1,16 @@
 # AI integration phases 
 
 
-# AI metadata extraction
+# AI metadata extraction 
+
+Qwen 2.5 VL instruction  
+- VPS or 
+- open router 0.2 0.2 I/O per M tokens  
+
+->  
+Asummin' 600 toks per extraction
+
+1000 users x 50 items ~ 50k items ~ 7$
 
 
 # AI suggestions  

@@ -224,12 +224,12 @@
 }
 
 .categoryBtn:hover {
-  border-color: #667eea;
+  border-color: #4DD0C8;
 }
 
 .categoryBtn.selected {
-  border-color: #667eea;
-  background: #f0f4ff;
+  border-color: #4DD0C8;
+  background: hsl(177 65% 95%);
 }
 
 .categoryIcon {

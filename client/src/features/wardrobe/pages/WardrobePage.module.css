@@ -41,13 +41,13 @@
 }
 
 .filterBtn:hover {
-  border-color: #667eea;
+  border-color: #4DD0C8;
 }
 
 .filterBtn.active {
-  background: #667eea;
+  background: #4DD0C8;
   color: white;
-  border-color: #667eea;
+  border-color: #4DD0C8;
 }
 
 .grid {
