@@ -4,13 +4,13 @@ import type {
   OrderWithDetails,
   CreateOrderRequest,
   PaginatedResponse,
-} from "@mytudo/shared";
+} from "@/shared";
 
 export const ordersApi = {
   getOrders: async (
     type: "buying" | "selling" = "buying",
     page: number = 1,
-    limit: number = 20
+    limit: number = 20,
   ): Promise<{ data: Order[]; meta: PaginatedResponse<Order>["meta"] }> => {
     const response = await apiClient.get("/orders", {
       params: { type, page, limit },

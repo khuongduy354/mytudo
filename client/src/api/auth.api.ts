@@ -8,25 +8,25 @@ import type {
   UserProfile,
   UpdateProfileRequest,
   RefreshTokenRequest,
-} from "@mytudo/shared";
+} from "@/shared";
 
 export const authApi = {
   loginWithEmail: async (
-    data: LoginWithEmailRequest
+    data: LoginWithEmailRequest,
   ): Promise<AuthResponse> => {
     const response = await apiClient.post("/auth/login", data);
     return response.data.data;
   },
 
   registerWithEmail: async (
-    data: RegisterWithEmailRequest
+    data: RegisterWithEmailRequest,
   ): Promise<AuthResponse> => {
     const response = await apiClient.post("/auth/register", data);
     return response.data.data;
   },
 
   sendMagicLink: async (
-    data: SendMagicLinkRequest
+    data: SendMagicLinkRequest,
   ): Promise<SendMagicLinkResponse> => {
     const response = await apiClient.post("/auth/send-magic-link", data);
     return response.data.data;
@@ -43,7 +43,7 @@ export const authApi = {
   },
 
   refreshToken: async (
-    data: RefreshTokenRequest
+    data: RefreshTokenRequest,
   ): Promise<{ accessToken: string; refreshToken: string }> => {
     const response = await apiClient.post("/auth/refresh", data);
     return response.data.data;

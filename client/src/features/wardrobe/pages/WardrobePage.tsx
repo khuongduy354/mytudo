@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useWardrobe } from "../hooks/useWardrobe";
-import {
-  ITEM_CATEGORIES,
-  CATEGORY_LABELS,
-  type ItemCategory,
-} from "@mytudo/shared";
+import { ITEM_CATEGORIES, CATEGORY_LABELS, type ItemCategory } from "@/shared";
 import styles from "./WardrobePage.module.css";
 
 const COLOR_MAP: Record<string, string> = {

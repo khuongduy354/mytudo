@@ -4,7 +4,7 @@ import {
   wardrobeFiltersSchema,
   createWardrobeSchema,
   updateWardrobeSchema,
-} from "@mytudo/shared";
+} from "../shared";
 
 export class WardrobeController {
   constructor(private wardrobeService: WardrobeService) {}
@@ -106,7 +106,7 @@ export class WardrobeController {
       const { wardrobeId } = req.params;
       const wardrobe = await this.wardrobeService.getWardrobe(
         wardrobeId,
-        userId
+        userId,
       );
 
       if (!wardrobe) {
@@ -127,7 +127,7 @@ export class WardrobeController {
       const userId = (req as any).userId;
       const wardrobe = await this.wardrobeService.createWardrobe(
         userId,
-        req.body
+        req.body,
       );
       res.status(201).json({ success: true, data: wardrobe });
     } catch (error) {
@@ -142,7 +142,7 @@ export class WardrobeController {
       const wardrobe = await this.wardrobeService.updateWardrobe(
         wardrobeId,
         userId,
-        req.body
+        req.body,
       );
       res.json({ success: true, data: wardrobe });
     } catch (error) {

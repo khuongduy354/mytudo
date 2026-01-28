@@ -6,6 +6,10 @@ duydevlog
 .vscode
 *dist* 
 
+*.d.ts
+*.js
+tsconfig.tsbuildinfo
+
 *.pyc
 .venv
 

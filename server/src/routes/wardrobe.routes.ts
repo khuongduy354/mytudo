@@ -8,12 +8,12 @@ import {
   updateWardrobeItemSchema,
   createWardrobeSchema,
   updateWardrobeSchema,
-} from "@mytudo/shared";
+} from "../shared";
 
 export function createWardrobeRouter(container: DIContainer): Router {
   const router = Router();
   const controller = container.resolve<WardrobeController>(
-    DI_KEYS.WARDROBE_CONTROLLER
+    DI_KEYS.WARDROBE_CONTROLLER,
   );
 
   // All routes require authentication
@@ -27,13 +27,13 @@ export function createWardrobeRouter(container: DIContainer): Router {
   router.post(
     "/",
     validateRequest(createWardrobeItemSchema),
-    controller.createItem
+    controller.createItem,
   );
 
   router.put(
     "/:id",
     validateRequest(updateWardrobeItemSchema),
-    controller.updateItem
+    controller.updateItem,
   );
 
   router.delete("/:id", controller.deleteItem);
@@ -45,13 +45,13 @@ export function createWardrobeRouter(container: DIContainer): Router {
   router.post(
     "/wardrobes",
     validateRequest(createWardrobeSchema),
-    controller.createWardrobe
+    controller.createWardrobe,
   );
 
   router.put(
     "/wardrobes/:wardrobeId",
     validateRequest(updateWardrobeSchema),
-    controller.updateWardrobe
+    controller.updateWardrobe,
   );
 
   router.delete("/wardrobes/:wardrobeId", controller.deleteWardrobe);

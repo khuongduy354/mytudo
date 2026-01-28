@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { useWardrobeById, useUpdateWardrobe } from "../hooks/useWardrobe";
-import type { WardrobeVisibility } from "@mytudo/shared";
+import type { WardrobeVisibility } from "@/shared";
 import styles from "./EditWardrobePage.module.css";
 
 export function EditWardrobePage() {

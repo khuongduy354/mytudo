@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { UserProfile } from "@mytudo/shared";
+import type { UserProfile } from "@/shared";
 
 interface AuthState {
   // State
@@ -68,8 +68,8 @@ export const useAuthStore = create<AuthState>()(
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,
       }),
-    }
-  )
+    },
+  ),
 );
 
 // Selector hooks for optimized re-renders

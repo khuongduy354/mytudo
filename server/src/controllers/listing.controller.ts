@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import type { ListingService } from "../services/listing.service.js";
-import { marketplaceFiltersSchema } from "@mytudo/shared";
+import { marketplaceFiltersSchema } from "../shared";
 
 export class ListingController {
   constructor(private listingService: ListingService) {}
@@ -24,7 +24,7 @@ export class ListingController {
       const result = await this.listingService.getMyListings(
         userId,
         page,
-        limit
+        limit,
       );
 
       res.json({
@@ -44,7 +44,7 @@ export class ListingController {
       const listing = await this.listingService.updateListing(
         id,
         userId,
-        req.body
+        req.body,
       );
       res.json({ success: true, data: listing });
     } catch (error) {
@@ -83,7 +83,7 @@ export class ListingController {
   getListingDetails = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     try {
       const userId = (req as any).userId;

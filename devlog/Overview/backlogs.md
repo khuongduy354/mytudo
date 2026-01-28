@@ -15,3 +15,7 @@ fix: types in #file:types is a reflectionf from #file:schemas
 After bought by a buyer, he owns that piece of product with a quantity ???
 
 - client-side image removal or server side  ? client side for now, xoa nen hoi lau nhe, va bi nhoe  
+
+
+lekhuongduy
+141Duy**

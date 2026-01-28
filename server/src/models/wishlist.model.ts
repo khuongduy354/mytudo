@@ -1,6 +1,6 @@
 import type { ISupabaseClient } from "../di/supabase.js";
-import type { WishlistItem } from "@mytudo/shared";
-import type { PaginationMeta } from "@mytudo/shared";
+import type { WishlistItem } from "../shared";
+import type { PaginationMeta } from "../shared";
 
 interface DbWishlistItem {
   id: string;
@@ -24,7 +24,7 @@ export class WishlistModel {
   async findByUser(
     userId: string,
     page: number = 1,
-    limit: number = 20
+    limit: number = 20,
   ): Promise<{ items: WishlistItem[]; meta: PaginationMeta }> {
     const offset = (page - 1) * limit;
 

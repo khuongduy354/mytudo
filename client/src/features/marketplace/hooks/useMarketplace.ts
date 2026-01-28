@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { marketplaceApi } from "../../../api";
-import type { ListingStatus, ItemCategory } from "@mytudo/shared";
+import type { ListingStatus, ItemCategory } from "@/shared";
 
 export function useMarketplace(filters?: {
   category?: ItemCategory;

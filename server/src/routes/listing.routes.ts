@@ -3,13 +3,13 @@ import { DIContainer, DI_KEYS } from "../di/container.js";
 import { ListingController } from "../controllers/listing.controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { validateRequest } from "../middleware/validation.middleware.js";
-import { createListingSchema, updateListingSchema } from "@mytudo/shared";
+import { createListingSchema, updateListingSchema } from "../shared";
 import type { ISupabaseClient } from "../di/supabase.js";
 
 export function createListingRouter(container: DIContainer): Router {
   const router = Router();
   const controller = container.resolve<ListingController>(
-    DI_KEYS.LISTING_CONTROLLER
+    DI_KEYS.LISTING_CONTROLLER,
   );
 
   // Protected routes for managing listings
@@ -17,7 +17,7 @@ export function createListingRouter(container: DIContainer): Router {
     "/",
     authenticate,
     validateRequest(createListingSchema),
-    controller.createListing
+    controller.createListing,
   );
 
   router.get("/my", authenticate, controller.getMyListings);
@@ -26,7 +26,7 @@ export function createListingRouter(container: DIContainer): Router {
     "/:id",
     authenticate,
     validateRequest(updateListingSchema),
-    controller.updateListing
+    controller.updateListing,
   );
 
   router.delete("/:id", authenticate, controller.removeListing);
@@ -37,7 +37,7 @@ export function createListingRouter(container: DIContainer): Router {
 export function createMarketplaceRouter(container: DIContainer): Router {
   const router = Router();
   const controller = container.resolve<ListingController>(
-    DI_KEYS.LISTING_CONTROLLER
+    DI_KEYS.LISTING_CONTROLLER,
   );
 
   // Optional auth for marketplace (to get wishlist status)
@@ -48,7 +48,7 @@ export function createMarketplaceRouter(container: DIContainer): Router {
       const token = authHeader.split(" ")[1];
       try {
         const supabase = container.resolve<ISupabaseClient>(
-          DI_KEYS.SUPABASE_CLIENT
+          DI_KEYS.SUPABASE_CLIENT,
         );
         const {
           data: { user },

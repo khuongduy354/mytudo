@@ -3,7 +3,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useCreateListing } from "../hooks/useListings";
 import { wardrobeApi } from "../../../api";
-import type { ListingCondition } from "@mytudo/shared";
+import type { ListingCondition } from "@/shared";
 import styles from "./SellItemPage.module.css";
 
 const CONDITIONS: { value: ListingCondition; label: string }[] = [

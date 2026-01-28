@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMarketplace } from "../hooks/useMarketplace";
 import { wishlistApi } from "../../../api";
-import type { ItemCategory } from "@mytudo/shared";
+import type { ItemCategory } from "@/shared";
 import styles from "./MarketplacePage.module.css";
 
 const CATEGORIES: { value: ItemCategory | ""; label: string }[] = [
@@ -54,7 +54,7 @@ export function MarketplacePage() {
   const handleWishlistToggle = (
     e: React.MouseEvent,
     listingId: string,
-    isWishlisted: boolean
+    isWishlisted: boolean,
   ) => {
     e.preventDefault();
     e.stopPropagation();
@@ -124,7 +124,10 @@ export function MarketplacePage() {
               step="50000"
               value={minPrice || 0}
               onChange={(e) => {
-                const value = Math.min(Number(e.target.value), Number(maxPrice) || 5000000);
+                const value = Math.min(
+                  Number(e.target.value),
+                  Number(maxPrice) || 5000000,
+                );
                 setMinPrice(value.toString());
               }}
               className="rangeSlider rangeSliderMin"
@@ -136,7 +139,10 @@ export function MarketplacePage() {
               step="50000"
               value={maxPrice || 5000000}
               onChange={(e) => {
-                const value = Math.max(Number(e.target.value), Number(minPrice) || 0);
+                const value = Math.max(
+                  Number(e.target.value),
+                  Number(minPrice) || 0,
+                );
                 setMaxPrice(value.toString());
               }}
               className="rangeSlider rangeSliderMax"
@@ -184,7 +190,7 @@ export function MarketplacePage() {
                     handleWishlistToggle(
                       e,
                       listing.id,
-                      listing.isWishlisted || false
+                      listing.isWishlisted || false,
                     )
                   }
                   disabled={

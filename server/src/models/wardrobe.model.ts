@@ -9,8 +9,8 @@ import type {
   WardrobeVisibility,
   CreateWardrobeRequest,
   UpdateWardrobeRequest,
-} from "@mytudo/shared";
-import type { PaginationMeta } from "@mytudo/shared";
+} from "../shared";
+import type { PaginationMeta } from "../shared";
 
 interface DbWardrobeItem {
   id: string;
@@ -63,7 +63,7 @@ export class WardrobeModel {
 
   async findByUser(
     userId: string,
-    filters: WardrobeFilters
+    filters: WardrobeFilters,
   ): Promise<{ items: WardrobeItem[]; meta: PaginationMeta }> {
     const { category, color, search, page = 1, limit = 20 } = filters;
     const offset = (page - 1) * limit;
@@ -109,7 +109,7 @@ export class WardrobeModel {
 
   async create(
     userId: string,
-    data: CreateWardrobeItemRequest
+    data: CreateWardrobeItemRequest,
   ): Promise<WardrobeItem> {
     const dbData = {
       user_id: userId,
@@ -138,7 +138,7 @@ export class WardrobeModel {
   async update(
     id: string,
     userId: string,
-    data: UpdateWardrobeItemRequest
+    data: UpdateWardrobeItemRequest,
   ): Promise<WardrobeItem> {
     const dbData: Partial<DbWardrobeItem> = {};
     if (data.imageUrl !== undefined) dbData.image_url = data.imageUrl;
@@ -190,7 +190,7 @@ export class WardrobeModel {
   async transferOwnership(
     itemId: string,
     newOwnerId: string,
-    targetWardrobeId: string
+    targetWardrobeId: string,
   ): Promise<void> {
     const { error } = await this.supabase
       .getClient()
@@ -271,7 +271,7 @@ export class WardrobeModel {
 
   async createWardrobe(
     userId: string,
-    data: CreateWardrobeRequest
+    data: CreateWardrobeRequest,
   ): Promise<Wardrobe> {
     const { data: result, error } = await this.supabase
       .getClient()
@@ -299,7 +299,7 @@ export class WardrobeModel {
   async updateWardrobe(
     id: string,
     userId: string,
-    data: UpdateWardrobeRequest
+    data: UpdateWardrobeRequest,
   ): Promise<Wardrobe> {
     const updates: any = {};
     if (data.name !== undefined) updates.name = data.name;

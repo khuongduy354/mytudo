@@ -9,7 +9,7 @@ import {
   sendMagicLinkSchema,
   updateProfileSchema,
   refreshTokenSchema,
-} from "@mytudo/shared";
+} from "../shared";
 
 export function createAuthRouter(container: DIContainer): Router {
   const router = Router();
@@ -19,26 +19,26 @@ export function createAuthRouter(container: DIContainer): Router {
   router.post(
     "/login",
     validateRequest(loginWithEmailSchema),
-    controller.loginWithEmail
+    controller.loginWithEmail,
   );
 
   router.post(
     "/register",
     validateRequest(registerWithEmailSchema),
-    controller.registerWithEmail
+    controller.registerWithEmail,
   );
 
   // Magic link auth route
   router.post(
     "/send-magic-link",
     validateRequest(sendMagicLinkSchema),
-    controller.sendMagicLink
+    controller.sendMagicLink,
   );
 
   router.post(
     "/refresh",
     validateRequest(refreshTokenSchema),
-    controller.refreshToken
+    controller.refreshToken,
   );
 
   // Protected routes
@@ -48,7 +48,7 @@ export function createAuthRouter(container: DIContainer): Router {
     "/profile",
     authenticate,
     validateRequest(updateProfileSchema),
-    controller.updateProfile
+    controller.updateProfile,
   );
 
   router.post("/logout", authenticate, controller.logout);

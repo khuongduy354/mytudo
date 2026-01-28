@@ -9,7 +9,7 @@ import {
   CATEGORY_LABELS,
   COMMON_COLORS,
   type ItemCategory,
-} from "@mytudo/shared";
+} from "@/shared";
 import styles from "./AddItemPage.module.css";
 
 const COLOR_MAP: Record<string, string> = {
