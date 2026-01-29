@@ -3,7 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../../../components/Button";
 import { Input } from "../../../components/Input";
 import { useCreateWardrobeItem, useWardrobes } from "../hooks/useWardrobe";
-import { uploadApi } from "../../../api/upload.api";
+import {
+  uploadApi,
+  type ExtractedItem,
+  type ExtractionResponse,
+} from "../../../api/upload.api";
 import {
   ITEM_CATEGORIES,
   CATEGORY_LABELS,
@@ -28,12 +32,26 @@ const COLOR_MAP: Record<string, string> = {
   navy: "#1e3a5f",
 };
 
+interface PendingItem extends ExtractedItem {
+  id: string;
+  imageFile: File;
+  imagePreview: string;
+  selected: boolean;
+}
+
 export function AddItemPage() {
   const navigate = useNavigate();
   const createMutation = useCreateWardrobeItem();
   const { data: wardrobes, isLoading: loadingWardrobes } = useWardrobes();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Multi-image mode state
+  const [mode, setMode] = useState<"single" | "multi">("single");
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [pendingItems, setPendingItems] = useState<PendingItem[]>([]);
+  const [isExtracting, setIsExtracting] = useState(false);
+
+  // Single-image mode state (original)
   const [originalFile, setOriginalFile] = useState<File | null>(null);
   const [originalPreview, setOriginalPreview] = useState<string | null>(null);
   const [processedFile, setProcessedFile] = useState<File | null>(null);
@@ -66,9 +84,15 @@ export function AddItemPage() {
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      processFile(file);
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    if (mode === "multi" || files.length > 1) {
+      setMode("multi");
+      const imageFiles = files.filter((f) => f.type.startsWith("image/"));
+      setSelectedFiles((prev) => [...prev, ...imageFiles]);
+    } else {
+      processFile(files[0]);
     }
   };
 
@@ -80,7 +104,11 @@ export function AddItemPage() {
       if (item.type.startsWith("image/")) {
         const file = item.getAsFile();
         if (file) {
-          processFile(file);
+          if (mode === "multi") {
+            setSelectedFiles((prev) => [...prev, file]);
+          } else {
+            processFile(file);
+          }
           e.preventDefault();
         }
         break;
@@ -97,9 +125,15 @@ export function AddItemPage() {
     e.preventDefault();
     e.stopPropagation();
 
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith("image/")) {
-      processFile(file);
+    const files = Array.from(e.dataTransfer.files).filter((f) =>
+      f.type.startsWith("image/")
+    );
+
+    if (mode === "multi" || files.length > 1) {
+      setMode("multi");
+      setSelectedFiles((prev) => [...prev, ...files]);
+    } else if (files.length === 1) {
+      processFile(files[0]);
     }
   };
 
@@ -108,7 +142,7 @@ export function AddItemPage() {
     const handleWindowPaste = (e: Event) => handlePaste(e as ClipboardEvent);
     window.addEventListener("paste", handleWindowPaste);
     return () => window.removeEventListener("paste", handleWindowPaste);
-  }, []);
+  }, [mode]);
 
   const handleRemoveBackground = async () => {
     if (!originalFile) return;
@@ -126,6 +160,111 @@ export function AddItemPage() {
       console.error("Background removal error:", err);
     } finally {
       setIsRemovingBg(false);
+    }
+  };
+
+  const handleExtractWithAI = async () => {
+    if (selectedFiles.length === 0) return;
+
+    try {
+      setIsExtracting(true);
+      setError(null);
+
+      const response = await uploadApi.extractAttributesBatch(selectedFiles);
+
+      // Convert extraction results to pending items
+      const items: PendingItem[] = [];
+      response.results.forEach((result: ExtractionResponse) => {
+        const file = selectedFiles[result.image_index];
+        result.items.forEach((item, itemIdx) => {
+          items.push({
+            ...item,
+            id: `${result.image_index}-${itemIdx}-${Date.now()}`,
+            imageFile: file,
+            imagePreview: URL.createObjectURL(file),
+            selected: true,
+          });
+        });
+      });
+
+      setPendingItems(items);
+    } catch (err: any) {
+      setError(err.message || "Không thể phân tích ảnh. Vui lòng thử lại.");
+      console.error("AI extraction error:", err);
+    } finally {
+      setIsExtracting(false);
+    }
+  };
+
+  const toggleItemSelection = (id: string) => {
+    setPendingItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, selected: !item.selected } : item
+      )
+    );
+  };
+
+  const updatePendingItem = (id: string, updates: Partial<PendingItem>) => {
+    setPendingItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, ...updates } : item))
+    );
+  };
+
+  const handleSubmitMultiple = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!wardrobeId) {
+      setError("Vui lòng chọn tủ đồ");
+      return;
+    }
+
+    const selectedItems = pendingItems.filter((item) => item.selected);
+    if (selectedItems.length === 0) {
+      setError("Vui lòng chọn ít nhất một món đồ");
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+
+      for (const item of selectedItems) {
+        // Validate category
+        const itemCategory = ITEM_CATEGORIES.includes(
+          item.category as ItemCategory
+        )
+          ? (item.category as ItemCategory)
+          : "accessories";
+
+        // Validate color
+        const itemColor = COMMON_COLORS.includes(item.color)
+          ? item.color
+          : "gray";
+
+        // Upload image
+        const imageUrl = await uploadApi.uploadImage(item.imageFile);
+
+        // Create wardrobe item
+        await createMutation.mutateAsync({
+          wardrobeId,
+          imageUrl,
+          category: itemCategory,
+          color: itemColor,
+          name: item.name || undefined,
+          brand: item.brand || undefined,
+          size: item.size || undefined,
+          material: item.material || undefined,
+          purchasePrice: item.estimated_price || undefined,
+        });
+      }
+
+      navigate("/");
+    } catch (err: any) {
+      setError(
+        err.response?.data?.error?.message || "Không thể thêm sản phẩm"
+      );
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -176,12 +315,241 @@ export function AddItemPage() {
 
       navigate("/");
     } catch (err: any) {
-      setError(err.response?.data?.error?.message || "Không thể thêm sản phẩm");
+      setError(
+        err.response?.data?.error?.message || "Không thể thêm sản phẩm"
+      );
     } finally {
       setIsUploading(false);
     }
   };
 
+  const removeFile = (index: number) => {
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const resetToSingleMode = () => {
+    setMode("single");
+    setSelectedFiles([]);
+    setPendingItems([]);
+  };
+
+  // Multi-image mode with pending items
+  if (pendingItems.length > 0) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.header}>
+          <button
+            className={styles.backBtn}
+            onClick={() => setPendingItems([])}
+          >
+            ←
+          </button>
+          <h1 className={styles.title}>Xác nhận món đồ</h1>
+        </div>
+
+        <form onSubmit={handleSubmitMultiple}>
+          {/* Wardrobe Selection */}
+          <div className={styles.form}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>
+                Tủ đồ <span className={styles.required}>*</span>
+              </label>
+              {loadingWardrobes ? (
+                <div className={styles.loading}>Đang tải...</div>
+              ) : wardrobes && wardrobes.length > 0 ? (
+                <select
+                  className={styles.select}
+                  value={wardrobeId}
+                  onChange={(e) => setWardrobeId(e.target.value)}
+                  required
+                >
+                  <option value="">Chọn tủ đồ</option>
+                  {wardrobes.map((w) => (
+                    <option key={w.id} value={w.id}>
+                      {w.name} (
+                      {w.visibility === "public" ? "Công khai" : "Riêng tư"})
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <div className={styles.noWardrobes}>
+                  Bạn chưa có tủ đồ nào. <a href="/wardrobes">Tạo tủ đồ mới</a>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Pending Items List */}
+          <div className={styles.pendingItemsList}>
+            <p className={styles.pendingItemsInfo}>
+              Đã phát hiện {pendingItems.length} món đồ. Chọn những món bạn muốn
+              thêm:
+            </p>
+            {pendingItems.map((item) => (
+              <div
+                key={item.id}
+                className={`${styles.pendingItem} ${
+                  item.selected ? styles.selected : ""
+                }`}
+              >
+                <div className={styles.pendingItemCheck}>
+                  <input
+                    type="checkbox"
+                    checked={item.selected}
+                    onChange={() => toggleItemSelection(item.id)}
+                  />
+                </div>
+                <img
+                  src={item.imagePreview}
+                  alt={item.name}
+                  className={styles.pendingItemImage}
+                />
+                <div className={styles.pendingItemDetails}>
+                  <input
+                    type="text"
+                    value={item.name}
+                    onChange={(e) =>
+                      updatePendingItem(item.id, { name: e.target.value })
+                    }
+                    className={styles.pendingItemName}
+                    placeholder="Tên sản phẩm"
+                  />
+                  <div className={styles.pendingItemMeta}>
+                    <span
+                      className={styles.pendingItemColor}
+                      style={{ backgroundColor: COLOR_MAP[item.color] || item.color }}
+                    />
+                    <span>{CATEGORY_LABELS[item.category as ItemCategory] || item.category}</span>
+                    {item.brand && <span>• {item.brand}</span>}
+                    {item.estimated_price && (
+                      <span>• ~{item.estimated_price.toLocaleString()}đ</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {error && <div className={styles.error}>{error}</div>}
+
+          <div className={styles.actions}>
+            <Button
+              type="submit"
+              isLoading={isUploading || createMutation.isPending}
+            >
+              Thêm {pendingItems.filter((i) => i.selected).length} món vào tủ đồ
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setPendingItems([])}
+            >
+              Quay lại
+            </Button>
+          </div>
+        </form>
+      </div>
+    );
+  }
+
+  // Multi-image selection mode
+  if (mode === "multi") {
+    return (
+      <div className={styles.page}>
+        <div className={styles.header}>
+          <button className={styles.backBtn} onClick={resetToSingleMode}>
+            ←
+          </button>
+          <h1 className={styles.title}>Thêm nhiều món đồ</h1>
+        </div>
+
+        <div
+          className={styles.imageSection}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleFileSelect}
+            style={{ display: "none" }}
+          />
+
+          {selectedFiles.length > 0 ? (
+            <div className={styles.multiImageGrid}>
+              {selectedFiles.map((file, idx) => (
+                <div key={idx} className={styles.multiImageItem}>
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt={`Selected ${idx + 1}`}
+                    className={styles.multiImagePreview}
+                  />
+                  <button
+                    type="button"
+                    className={styles.removeImageBtn}
+                    onClick={() => removeFile(idx)}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+              <div
+                className={styles.addMoreImage}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <span>+</span>
+              </div>
+            </div>
+          ) : (
+            <div
+              className={styles.imagePlaceholder}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <span className={styles.placeholderText}>
+                Chọn nhiều ảnh, kéo thả hoặc dán (Ctrl+V)
+              </span>
+            </div>
+          )}
+        </div>
+
+        {selectedFiles.length > 0 && (
+          <div className={styles.form}>
+            <div className={styles.aiExtractionInfo}>
+              <p>
+                🤖 AI sẽ phân tích {selectedFiles.length} ảnh và tự động nhận
+                diện các món đồ trong mỗi ảnh.
+              </p>
+            </div>
+
+            <div className={styles.actions}>
+              <Button
+                type="button"
+                onClick={handleExtractWithAI}
+                isLoading={isExtracting}
+              >
+                {isExtracting
+                  ? "Đang phân tích..."
+                  : `Phân tích ${selectedFiles.length} ảnh với AI`}
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={resetToSingleMode}
+              >
+                Hủy
+              </Button>
+            </div>
+
+            {error && <div className={styles.error}>{error}</div>}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Single image mode (original UI)
   return (
     <div className={styles.page}>
       <div className={styles.header}>
@@ -189,6 +557,24 @@ export function AddItemPage() {
           ←
         </button>
         <h1 className={styles.title}>Thêm món đồ</h1>
+      </div>
+
+      {/* Mode Switch */}
+      <div className={styles.modeSwitch}>
+        <button
+          type="button"
+          className={`${styles.modeSwitchBtn} ${styles.active}`}
+          onClick={() => setMode("single")}
+        >
+          Một ảnh
+        </button>
+        <button
+          type="button"
+          className={styles.modeSwitchBtn}
+          onClick={() => setMode("multi")}
+        >
+          Nhiều ảnh (AI)
+        </button>
       </div>
 
       <form onSubmit={handleSubmit}>

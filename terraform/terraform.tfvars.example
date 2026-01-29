@@ -1,0 +1,24 @@
+# Terraform settings - copy to terraform.tfvars and fill in values
+# NEVER commit this file to git!
+
+do_token       = "your-digitalocean-api-token"
+gemini_api_key = "your-gemini-api-key"
+
+# Optional overrides
+# droplet_name = "mytudo-ai-service"
+# region       = "sgp1"
+# droplet_size = "s-2vcpu-2gb"
+# client_url   = "https://your-client-domain.com"
+
+# SSH Configuration (choose one):
+# Option 1: Provide public key content
+# ssh_public_key = "ssh-rsa AAAA..."
+
+# Option 2: Use existing DigitalOcean SSH key IDs
+# existing_ssh_key_ids = ["12345678"]
+
+# Restrict SSH access (recommended for production)
+# ssh_allowed_ips = ["your.ip.address/32"]
+
+# Create a reserved (static) IP - adds extra cost
+# create_reserved_ip = true
