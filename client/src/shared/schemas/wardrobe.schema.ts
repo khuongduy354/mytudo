@@ -16,6 +16,7 @@ export const createWardrobeItemSchema = z.object({
   size: z.string().max(20).optional(),
   material: z.string().max(50).optional(),
   purchasePrice: z.number().positive().optional(),
+  embedding: z.array(z.number()).optional(),
 });
 
 export const updateWardrobeItemSchema = z.object({

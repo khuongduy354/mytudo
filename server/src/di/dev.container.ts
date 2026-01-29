@@ -19,6 +19,7 @@ import { ListingService } from "../services/listing.service.js";
 import { WishlistService } from "../services/wishlist.service.js";
 import { UploadService } from "../services/upload.service.js";
 import { OrderService } from "../services/order.service.js";
+import { DebugService } from "../services/debug.service.js";
 
 // Controllers
 import { AuthController } from "../controllers/auth.controller.js";
@@ -27,6 +28,9 @@ import { ListingController } from "../controllers/listing.controller.js";
 import { WishlistController } from "../controllers/wishlist.controller.js";
 import { UploadController } from "../controllers/upload.controller.js";
 import { OrderController } from "../controllers/order.controller.js";
+import { DebugController } from "../controllers/debug.controller.js";
+import { AiController } from "../controllers/ai.controller.js";
+import { AiService } from "../services/ai.service.js";
 
 export function createDevContainer(): DIContainer {
   console.log("[Container] Initializing DEV container...");
@@ -127,6 +131,17 @@ export function createDevContainer(): DIContainer {
     return new OrderService(orderModel, listingModel, wardrobeModel);
   });
 
+  container.registerFactory(DI_KEYS.DEBUG_SERVICE, () => {
+    const supabase = container.resolve<ISupabaseClient>(
+      DI_KEYS.SUPABASE_CLIENT
+    );
+    return new DebugService(supabase.getClient());
+  });
+
+  container.registerFactory(DI_KEYS.AI_SERVICE, () => {
+    return new AiService();
+  });
+
   // Controllers
   container.registerFactory(DI_KEYS.AUTH_CONTROLLER, () => {
     const authService = container.resolve<AuthService>(DI_KEYS.AUTH_SERVICE);
@@ -164,6 +179,16 @@ export function createDevContainer(): DIContainer {
   container.registerFactory(DI_KEYS.ORDER_CONTROLLER, () => {
     const orderService = container.resolve<OrderService>(DI_KEYS.ORDER_SERVICE);
     return new OrderController(orderService);
+  });
+
+  container.registerFactory(DI_KEYS.DEBUG_CONTROLLER, () => {
+    const debugService = container.resolve<DebugService>(DI_KEYS.DEBUG_SERVICE);
+    return new DebugController(debugService);
+  });
+
+  container.registerFactory(DI_KEYS.AI_CONTROLLER, () => {
+    const aiService = container.resolve<AiService>(DI_KEYS.AI_SERVICE);
+    return new AiController(aiService);
   });
 
   console.log("[Container] DEV container initialized");

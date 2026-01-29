@@ -22,6 +22,8 @@ import {
 import { createWishlistRouter } from "./routes/wishlist.routes.js";
 import { createUploadRouter } from "./routes/upload.routes.js";
 import { createOrderRouter } from "./routes/order.routes.js";
+import { createDebugRouter } from "./routes/debug.routes.js";
+import { createAiRouter } from "./routes/ai.routes.js";
 
 // Error handler
 import { errorHandler } from "./middleware/error.middleware.js";
@@ -58,6 +60,8 @@ app.use("/api/marketplace", createMarketplaceRouter(container));
 app.use("/api/wishlist", createWishlistRouter(container));
 app.use("/api/upload", createUploadRouter(container));
 app.use("/api/orders", createOrderRouter(container));
+app.use("/api/debug", createDebugRouter(container));
+app.use("/api/ai", createAiRouter(container));
 
 // Health check
 app.get("/api/health", (req, res) => {

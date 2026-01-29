@@ -1,12 +1,12 @@
 # AI Service Dockerfile
 # Multi-stage build for optimal size
 
-FROM python:3.11-slim as builder
+FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
-# Install poetry
-RUN pip install poetry
+# Install poetry with export plugin
+RUN pip install poetry poetry-plugin-export
 
 # Copy poetry files
 COPY pyproject.toml poetry.lock* ./
@@ -25,7 +25,7 @@ RUN apt-get update && apt-get install -y \
     libsm6 \
     libxext6 \
     libxrender-dev \
-    libgl1-mesa-glx \
+    libgl1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements from builder

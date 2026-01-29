@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, Form
 from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -9,14 +9,19 @@ from PIL import Image
 import io
 import os
 import base64
-from google import genai
+from openai import OpenAI
+
 from dotenv import load_dotenv
+import json
+
+# Embedding service import
+from .embedding_service import get_embedding_service
 
 # Load environment variables from .env file
 load_dotenv()
 
 # Initialize FastAPI app
-app = FastAPI(title="AI Service - Background Removal & Attribute Extraction")
+app = FastAPI(title="AI Service - Background Removal, Attribute Extraction & Embeddings")
 
 # Configure CORS
 app.add_middleware(
@@ -43,11 +48,14 @@ pipe = pipeline(
     use_fast=True
 )
 
-# Initialize Gemini client
-gemini_client = None
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-if GEMINI_API_KEY:
-    gemini_client = genai.Client(api_key=GEMINI_API_KEY)
+# Initialize OpenRouter client
+openai_client = None
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+if OPENROUTER_API_KEY:
+    openai_client = OpenAI(
+        base_url="https://openrouter.ai/api/v1",
+        api_key=OPENROUTER_API_KEY
+    )
 
 
 # Pydantic models for responses
@@ -107,30 +115,32 @@ def image_to_base64(image: Image.Image) -> str:
 
 
 async def extract_attributes_from_image(image: Image.Image) -> list[ExtractedItem]:
-    """Use Gemini to extract clothing attributes from an image."""
-    if not gemini_client:
+    """Use OpenRouter (Qwen) to extract clothing attributes from an image."""
+    if not openai_client:
         raise HTTPException(
             status_code=503,
-            detail="Gemini API not configured. Set GEMINI_API_KEY environment variable."
+            detail="OpenRouter API not configured. Set OPENROUTER_API_KEY environment variable."
         )
 
     try:
-        # Convert image to bytes for Gemini
+        # Convert image to bytes for OpenRouter
         img_bytes = io.BytesIO()
         image.save(img_bytes, format="PNG")
         img_bytes.seek(0)
+        base64_image = base64.b64encode(img_bytes.getvalue()).decode()
 
-        # Call Gemini with image
-        response = gemini_client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=[
+        # Call OpenRouter with image
+        response = openai_client.chat.completions.create(
+            model="google/gemma-3-4b-it:free",
+            messages=[
                 {
-                    "parts": [
-                        {"text": EXTRACTION_PROMPT},
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": EXTRACTION_PROMPT},
                         {
-                            "inline_data": {
-                                "mime_type": "image/png",
-                                "data": base64.b64encode(img_bytes.getvalue()).decode()
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/png;base64,{base64_image}"
                             }
                         }
                     ]
@@ -138,9 +148,11 @@ async def extract_attributes_from_image(image: Image.Image) -> list[ExtractedIte
             ]
         )
 
+        response_text = response.choices[0].message.content
+
+
         # Parse JSON response
-        import json
-        response_text = response.text.strip()
+        response_text = response_text.strip()
         # Handle markdown code blocks
         if response_text.startswith("```"):
             response_text = response_text.split("```")[1]
@@ -159,7 +171,7 @@ async def extract_attributes_from_image(image: Image.Image) -> list[ExtractedIte
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Gemini API error: {str(e)}"
+            detail=f"OpenRouter/Qwen API error: {str(e)}"
         )
 
 
@@ -176,14 +188,19 @@ async def remove_background_from_image(image: Image.Image) -> bytes:
 async def root():
     return {
         "message": "AI Service is running",
-        "features": ["background-removal", "attribute-extraction"],
-        "gemini_configured": gemini_client is not None
+        "features": ["background-removal", "attribute-extraction", "fashion-embedding"],
+        "ai_configured": openai_client is not None,
+        "embedding_service": "active"
     }
 
 
 @app.get("/health")
 async def health():
-    return {"status": "healthy", "gemini_configured": gemini_client is not None}
+    return {
+        "status": "healthy", 
+        "ai_configured": openai_client is not None,
+        "embedding_service": "active"
+    }
 
 
 @app.post("/remove-bg")
@@ -217,7 +234,7 @@ async def remove_background(file: UploadFile = File(...)):
 @app.post("/extract-attributes", response_model=ExtractionResponse)
 async def extract_attributes(file: UploadFile = File(...)):
     """
-    Extract clothing item attributes from an image using Gemini AI.
+    Extract clothing item attributes from an image using OpenRouter/Qwen AI.
     Can detect multiple items in a single image.
     """
     if not file.content_type or not file.content_type.startswith("image/"):
@@ -304,6 +321,183 @@ async def batch_extract_attributes(files: list[UploadFile] = File(...)):
             results.append(ExtractionResponse(items=[], image_index=idx))
 
     return BatchExtractionResponse(results=results, total_items=total_items)
+
+
+# ===========================================
+# EMBEDDING GENERATION ENDPOINTS
+# ===========================================
+
+class EmbeddingResponse(BaseModel):
+    """Response for single embedding generation."""
+    embedding: list[float]
+    dimensions: int
+
+
+class BatchEmbeddingItem(BaseModel):
+    """Single item in batch embedding response."""
+    index: int
+    filename: Optional[str] = None
+    success: bool
+    embedding: Optional[list[float]] = None
+    error: Optional[str] = None
+
+
+class BatchEmbeddingResponse(BaseModel):
+    """Response for batch embedding generation."""
+    results: list[BatchEmbeddingItem]
+    total: int
+    successful: int
+
+
+class CompatibilityRequest(BaseModel):
+    """Request for compatibility scoring."""
+    embedding1: list[float]
+    embedding2: list[float]
+
+
+class CompatibilityResponse(BaseModel):
+    """Response for compatibility scoring."""
+    similarity: float
+    compatibility_score: float
+
+
+class FindCompatibleRequest(BaseModel):
+    """Request to find compatible items."""
+    target_embedding: list[float]
+    candidates: list[dict]
+    top_k: int = 5
+
+
+class FindCompatibleResponse(BaseModel):
+    """Response with compatible items."""
+    results: list[dict]
+
+
+@app.post("/generate-embedding", response_model=EmbeddingResponse)
+async def generate_embedding(file: UploadFile = File(...)):
+    """
+    Generate a 64-dimensional fashion embedding for an image.
+    Uses ResNet-18 backbone trained on fashion compatibility.
+    """
+    if not file.content_type or not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="File must be an image")
+
+    try:
+        contents = await file.read()
+        image = Image.open(io.BytesIO(contents))
+        
+        embedding_service = get_embedding_service()
+        embedding = embedding_service.generate_embedding(image)
+        
+        return EmbeddingResponse(
+            embedding=embedding,
+            dimensions=len(embedding)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate embedding: {str(e)}"
+        )
+
+
+@app.post("/batch/generate-embedding", response_model=BatchEmbeddingResponse)
+async def batch_generate_embedding(files: list[UploadFile] = File(...)):
+    """
+    Generate embeddings for multiple images in batch.
+    More efficient than calling single endpoint multiple times.
+    """
+    results = []
+    successful = 0
+    
+    embedding_service = get_embedding_service()
+    
+    for idx, file in enumerate(files):
+        if not file.content_type or not file.content_type.startswith("image/"):
+            results.append(BatchEmbeddingItem(
+                index=idx,
+                filename=file.filename,
+                success=False,
+                error="File must be an image"
+            ))
+            continue
+        
+        try:
+            contents = await file.read()
+            image = Image.open(io.BytesIO(contents))
+            embedding = embedding_service.generate_embedding(image)
+            
+            results.append(BatchEmbeddingItem(
+                index=idx,
+                filename=file.filename,
+                success=True,
+                embedding=embedding
+            ))
+            successful += 1
+        except Exception as e:
+            results.append(BatchEmbeddingItem(
+                index=idx,
+                filename=file.filename,
+                success=False,
+                error=str(e)
+            ))
+    
+    return BatchEmbeddingResponse(
+        results=results,
+        total=len(files),
+        successful=successful
+    )
+
+
+@app.post("/compute-compatibility", response_model=CompatibilityResponse)
+async def compute_compatibility(request: CompatibilityRequest):
+    """
+    Compute compatibility score between two embeddings.
+    Returns both raw cosine similarity and a 0-100 compatibility score.
+    """
+    try:
+        embedding_service = get_embedding_service()
+        
+        similarity = embedding_service.compute_similarity(
+            request.embedding1,
+            request.embedding2
+        )
+        compatibility_score = embedding_service.compute_compatibility_score(
+            request.embedding1,
+            request.embedding2
+        )
+        
+        return CompatibilityResponse(
+            similarity=round(similarity, 4),
+            compatibility_score=compatibility_score
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to compute compatibility: {str(e)}"
+        )
+
+
+@app.post("/find-compatible", response_model=FindCompatibleResponse)
+async def find_compatible(request: FindCompatibleRequest):
+    """
+    Find the most compatible items from a list of candidates.
+    Each candidate should have 'id' and 'embedding' fields.
+    """
+    try:
+        embedding_service = get_embedding_service()
+        
+        results = embedding_service.find_most_compatible(
+            target_embedding=request.target_embedding,
+            candidate_embeddings=request.candidates,
+            top_k=request.top_k
+        )
+        
+        return FindCompatibleResponse(results=results)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to find compatible items: {str(e)}"
+        )
 
 
 if __name__ == "__main__":

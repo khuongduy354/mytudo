@@ -122,6 +122,7 @@ export class WardrobeModel {
       size: data.size || null,
       material: data.material || null,
       purchase_price: data.purchasePrice || null,
+      embedding: data.embedding || null,
     };
 
     const { data: result, error } = await this.supabase

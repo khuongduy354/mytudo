@@ -15,12 +15,14 @@ import { SellItemPage } from "./features/listings/pages/SellItemPage";
 import { MyListingsPage } from "./features/listings/pages/MyListingsPage";
 import { WishlistPage } from "./features/wishlist/pages/WishlistPage";
 import { ProfilePage } from "./features/profile/pages/ProfilePage";
+import { FashionDebugPage } from "./features/debug/pages/FashionDebugPage";
 
 function App() {
   return (
     <Routes>
       {/* Public Routes */}
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/debug/fashion" element={<FashionDebugPage />} />
 
       {/* Protected Routes */}
       <Route element={<ProtectedRoute />}>

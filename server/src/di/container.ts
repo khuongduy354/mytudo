@@ -78,4 +78,12 @@ export const DI_KEYS = {
   WISHLIST_CONTROLLER: "WishlistController",
   UPLOAD_CONTROLLER: "UploadController",
   ORDER_CONTROLLER: "OrderController",
+  DEBUG_CONTROLLER: "DebugController",
+
+  // Debug
+  DEBUG_SERVICE: "DebugService",
+  
+  // AI
+  AI_SERVICE: "AiService",
+  AI_CONTROLLER: "AiController",
 } as const;

@@ -71,6 +71,10 @@ export function AddItemPage() {
   const [material, setMaterial] = useState("");
   const [purchasePrice, setPurchasePrice] = useState("");
 
+
+  const [embedding, setEmbedding] = useState<number[] | null>(null);
+  const [isGeneratingEmbedding, setIsGeneratingEmbedding] = useState(false);
+
   const [error, setError] = useState<string | null>(null);
 
   const processFile = (file: File) => {
@@ -161,6 +165,76 @@ export function AddItemPage() {
     } finally {
       setIsRemovingBg(false);
     }
+
+  };
+
+  const handleSingleExtract = async () => {
+    if (!originalFile) return;
+    try {
+      setIsExtracting(true);
+      setError(null);
+
+      const response = await uploadApi.extractAttributes(originalFile);
+      console.log("Extracted attributes:", response);
+
+      if (response.items && response.items.length > 0) {
+        const item = response.items[0];
+
+        // Map category
+        const normalizedCategory = item.category.toLowerCase();
+        const itemCategory = ITEM_CATEGORIES.includes(
+          normalizedCategory as ItemCategory
+        )
+          ? (normalizedCategory as ItemCategory)
+          : "accessories";
+        setCategory(itemCategory);
+
+        // Map color
+        const normalizedColor = item.color.toLowerCase();
+        const itemColor = COMMON_COLORS.includes(normalizedColor)
+          ? normalizedColor
+          : "gray";
+        setColor(itemColor);
+
+        if (item.name) setName(item.name);
+        if (item.brand) setBrand(item.brand);
+        if (item.material) setMaterial(item.material);
+        if (item.size) setSize(item.size);
+        if (item.estimated_price)
+          setPurchasePrice(item.estimated_price.toString());
+      }
+    } catch (err: any) {
+      setError(err.message || "AI Analysis failed");
+    } finally {
+      setIsExtracting(false);
+    }
+  };
+
+  const handleGenerateEmbedding = async () => {
+    const fileToProcess =
+      selectedVersion === "processed" && processedFile
+        ? processedFile
+        : originalFile;
+
+    if (!fileToProcess) return;
+
+    try {
+      setIsGeneratingEmbedding(true);
+      setError(null);
+      console.log("Generating embedding...");
+
+      const response = await uploadApi.generateEmbedding(fileToProcess);
+      console.log("Embedding result:", response);
+
+      if (response && response.embedding) {
+        setEmbedding(response.embedding);
+      }
+    } catch (err: any) {
+      console.error("Embedding generation error:", err);
+      setError(err.message || "Failed to generate embedding");
+    } finally {
+      setIsGeneratingEmbedding(false);
+    }
   };
 
   const handleExtractWithAI = async () => {
@@ -171,6 +245,7 @@ export function AddItemPage() {
       setError(null);
 
       const response = await uploadApi.extractAttributesBatch(selectedFiles);
+      console.log("Batch extraction result:", response);
 
       // Convert extraction results to pending items
       const items: PendingItem[] = [];
@@ -179,6 +254,8 @@ export function AddItemPage() {
         result.items.forEach((item, itemIdx) => {
           items.push({
             ...item,
+            category: item.category.toLowerCase(),
+            color: item.color.toLowerCase(),
             id: `${result.image_index}-${itemIdx}-${Date.now()}`,
             imageFile: file,
             imagePreview: URL.createObjectURL(file),
@@ -229,16 +306,16 @@ export function AddItemPage() {
       setIsUploading(true);
 
       for (const item of selectedItems) {
-        // Validate category
-        const itemCategory = ITEM_CATEGORIES.includes(
-          item.category as ItemCategory
-        )
-          ? (item.category as ItemCategory)
+        // Validate category (case-insensitive)
+        const normalizedCategory = item.category.toLowerCase();
+        const itemCategory = ITEM_CATEGORIES.includes(normalizedCategory as ItemCategory)
+          ? (normalizedCategory as ItemCategory)
           : "accessories";
 
-        // Validate color
-        const itemColor = COMMON_COLORS.includes(item.color)
-          ? item.color
+        // Validate color (case-insensitive)
+        const normalizedColor = item.color.toLowerCase();
+        const itemColor = COMMON_COLORS.includes(normalizedColor)
+          ? normalizedColor
           : "gray";
 
         // Upload image
@@ -311,6 +388,7 @@ export function AddItemPage() {
         size: size || undefined,
         material: material || undefined,
         purchasePrice: purchasePrice ? Number(purchasePrice) : undefined,
+        embedding: embedding || undefined,
       });
 
       navigate("/");
@@ -635,6 +713,26 @@ export function AddItemPage() {
                   : processedFile
                     ? "✓ Đã xóa nền"
                     : "Xóa nền"}
+              </button>
+              <button
+                type="button"
+                className={`${styles.imageActionBtn} ${styles.aiBtn}`}
+                onClick={handleSingleExtract}
+                disabled={isExtracting}
+              >
+                {isExtracting ? "Đang phân tích..." : "✨ AI Phân tích"}
+              </button>
+              <button
+                type="button"
+                className={`${styles.imageActionBtn} ${styles.aiBtn}`}
+                onClick={handleGenerateEmbedding}
+                disabled={isGeneratingEmbedding}
+              >
+                {isGeneratingEmbedding
+                  ? "Đang tạo..."
+                  : embedding
+                    ? "✓ Embedding"
+                    : "⚡ Vector"}
               </button>
             </div>
           )}
