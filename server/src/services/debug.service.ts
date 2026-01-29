@@ -29,4 +29,17 @@ export class DebugService {
 
     return data;
   }
+
+  async getAllWardrobeItems(): Promise<any[]> {
+    const { data, error } = await this.supabase
+      .from("wardrobe_items")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      throw new Error(`Failed to fetch wardrobe items: ${error.message}`);
+    }
+
+    return data || [];
+  }
 }

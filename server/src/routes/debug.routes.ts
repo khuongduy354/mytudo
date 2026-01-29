@@ -9,6 +9,7 @@ export function createDebugRouter(container: DIContainer): Router {
   );
 
   router.post("/embedding", controller.saveEmbedding);
+  router.get("/items", controller.getWardrobeItems);
 
   return router;
 }

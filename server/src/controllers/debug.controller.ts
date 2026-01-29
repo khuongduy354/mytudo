@@ -33,4 +33,20 @@ export class DebugController {
       next(error);
     }
   };
+
+  getWardrobeItems = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const items = await this.debugService.getAllWardrobeItems();
+      res.json({
+        success: true,
+        data: items,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

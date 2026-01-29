@@ -2,7 +2,7 @@ import { apiClient } from "./client";
 import { uploadApi } from "./upload.api";
 
 const AI_SERVICE_URL =
-  import.meta.env.VITE_AI_SERVICE_URL || "http://localhost:8002";
+  import.meta.env.VITE_AI_SERVICE_URL || "http://localhost:8001";
 
 
 // Types
@@ -128,6 +128,12 @@ export const debugApi = {
         filename: file.name
     });
     
+    
     return response.data;
+  },
+
+  getWardrobeItems: async (): Promise<any[]> => {
+    const response = await apiClient.get("/debug/items");
+    return response.data.data;
   }
 };
