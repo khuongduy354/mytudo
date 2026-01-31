@@ -10,6 +10,9 @@ duydevlog
 *.js
 tsconfig.tsbuildinfo
 
+
+model_epoch_5.pth
+
 *.pyc
 .venv
 

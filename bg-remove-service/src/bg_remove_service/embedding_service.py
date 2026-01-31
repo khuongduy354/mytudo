@@ -87,7 +87,8 @@ class FashionEmbeddingService:
     def _load_checkpoint(self, model_path: str):
         """Load model weights from checkpoint."""
         try:
-            checkpoint = torch.load(model_path, map_location=self.device)
+            # Load with weights_only=False for compatibility with older PyTorch checkpoints
+            checkpoint = torch.load(model_path, map_location=self.device, weights_only=False)
             
             # Handle different checkpoint formats
             if 'state_dict' in checkpoint:
